@@ -30,7 +30,7 @@
                 }]
             }, [
                 'app/ReportGeneratorWizard',
-                
+
                 'dojo/dom',
                 'dojo/topic',
                 'dojo/on',
@@ -40,9 +40,23 @@
             function(Module, dom, topic, on) {
                 widgetUnderTest = new Module({}, contentNode);
 
-                on(dom.byId("btn"), "click", function(){
-                    topic.publish('app/report-wizard-geometry', {geom: [1,2,3]});
-                })
+                topic.subscribe('app/enable-tool', function(tool) {
+                    dom.byId('publish').innerHTML = tool;
+                });
+
+                on(dom.byId("btn"), "click", function() {
+                    topic.publish('app/report-wizard-geometry', {
+                        geom: [1, 2, 3]
+                    });
+                });
+
+                window.AGRC = {
+                    urls: {
+                        vector: 'http://mapserv.utah.gov/arcgis/rest/services/BaseMaps/Vector/MapServer',
+                        mainReport: '/arcgis/rest/services/PEL/Toolbox/GPServer/PEL_Main',
+                        catexReport: '/arcgis/rest/services/PEL/Toolbox/GPServer/PEL_CatEx'
+                    }
+                };
             });
         </script>
     </head>
@@ -53,6 +67,7 @@
         <div id="contentNode">
         </div>
 
+    <label id="publish"></label>
     <input type="button" id="btn" value="geometry set"></button>
     <script src="../../jquery/jquery.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
