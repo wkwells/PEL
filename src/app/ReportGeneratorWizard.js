@@ -92,7 +92,7 @@ define([
                     name: null
                 });
 
-                this.numbersOnly = new RegExp('(\\d*[.])?\\d+');
+                this.numbersOnly = new RegExp('^[0-9.]+$');
             },
             postCreate: function() {
                 // summary:
