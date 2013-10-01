@@ -1,20 +1,5 @@
- .wizard .highlight {
-    display: block;
-    padding: 6px 14px;
-    margin-bottom: -5px;
-    background-color: #f7f7f9;
-    border: 1px solid #e1e1e8;
-    border-radius: 4px;
-}
 .wizard-container { 
-    height: 100% !important;
+    height: auto !important;
     width: 100%;
-    position: relative;
-}
-.wizard { 
-    width: 250px;
-}
-
-.wizard .dijitContentPane {
-    padding: 0;
+    display: block;
 }

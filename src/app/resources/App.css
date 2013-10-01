@@ -8,6 +8,7 @@
 @import '../../agrc/resources/locate/MagicZoom.css';
 /*@import '../../bootstrap/css/bootstrap.css';*/
 @import '../../bootstrap/css/bootstrap-theme.css';
+@import '../../app/resources/ReportGeneratorWizard.css';
 
 body, html, .app {
     width: 100%;
@@ -51,13 +52,13 @@ body, html, .app {
 
 /* SIDE BAR */
 .app .side-bar {
-    width: 300px;
+    width: 400px;
     padding: 0;
     overflow-y: auto;
     overflow-x: hidden;
 }
 .app .side-bar-sizer {
-    width: 302px;
+    width: 402px;
     margin: -1px;
 }
 .app .padder {
