@@ -10,6 +10,7 @@ define([
         'dojo/on',
         'dojo/aspect',
         'dojo/Stateful',
+        'dojo/topic',
 
         'dojo/dom-class',
         'dojo/dom-construct',
@@ -36,6 +37,7 @@ define([
         on,
         aspect,
         Stateful,
+        topic,
 
         domClass,
         domConstruct,
@@ -61,11 +63,20 @@ define([
             // the template page that is visible
             currentPage: 0,
 
+            //regex
+            numbersOnly: null,
+
+            //dojo stateful
             reportParams: null,
 
-            jobId: null,
-
+            //properties to validate in order to show submit button
             validationProps: ['type', 'geometry', 'buffer', 'name'],
+
+            //esri/tasks/geoprocessing
+            gp: null,
+
+            //async gp task job id
+            jobId: null,
 
             constructor: function() {
                 // summary:
@@ -80,6 +91,8 @@ define([
                     buffer: null,
                     name: null
                 });
+
+                this.numbersOnly = new RegExp("(\\d*[.])?\\d+");
             },
             postCreate: function() {
                 // summary:
@@ -91,8 +104,6 @@ define([
                 this.setupWizard();
 
                 this.setupConnections();
-
-                this.initGp();
             },
             setupWizard: function() {
                 // summary:
@@ -102,10 +113,11 @@ define([
                 this.pages = [this.cp1, this.cp2, this.cp3];
 
                 this.cp1.updateParameters = lang.hitch(this, 'updateParamsFromButton');
-                this.cp1.validate = lang.hitch(this, 'showNextPage');
+                this.cp1.validate = lang.hitch(this, 'initReportType');
 
                 this.cp2.updateParameters = lang.hitch(this, 'updateParamsFromTextBox');
                 this.cp2.validate = lang.hitch(this, 'validateGeometryPane');
+                this.cp2.onShow = lang.hitch(this, 'validateGeometryPane');
                 this.cp2.next = lang.hitch(this, 'showNextPage');
 
                 this.cp3.updateParameters = lang.hitch(this, 'updateParamsFromTextBox');
@@ -119,6 +131,11 @@ define([
                 console.log(this.declaredClass + "::setupConnections", arguments);
 
                 this.subscribe('app/report-wizard-geometry', lang.hitch(this, 'setGeometry'));
+
+                this.own(
+                    on(this.bufferInput, 'change', lang.hitch(this, 'updateParams')),
+                    on(this.bufferInput, 'keyup', lang.hitch(this, 'updateParams'))
+                );
 
                 aspect.after(this, 'showNextPage', lang.hitch(this, 'setupWizardPane'));
                 aspect.after(this, 'setGeometry', lang.hitch(this, 'displayGeometryConfirmation'));
@@ -156,6 +173,10 @@ define([
 
                 var pane = this.pages[this.currentPage];
                 this.sc.selectChild(pane);
+
+                if (lang.isFunction(pane.onShow)) {
+                    pane.onShow();
+                }
             },
             back: function() {
                 console.info(this.declaredClass + "::back", arguments);
@@ -183,7 +204,7 @@ define([
                 if (lang.isFunction(currentPage.validate)) {
                     currentPage.validate(evt);
                 }
-                
+
                 this.showSubmitButton();
             },
             updateParamsFromButton: function(evt) {
@@ -234,8 +255,15 @@ define([
                 //      validates the unique geometry view
                 console.log(this.declaredClass + "::validateGeometryPane", arguments);
 
+                var buffer = this.reportParams.get('buffer');
 
-                if (!this.reportParams.get('geometry') || !this.reportParams.get('buffer')) {
+                if (this.numbersOnly.test(buffer)) {
+                    domClass.add(this.bufferGroup, 'has-success', 'has-error');
+                } else {
+                    domClass.add(this.bufferGroup, 'has-error', 'has-success');
+                }
+
+                if (!this.reportParams.get('geometry') || !buffer) {
                     domAttr.set(this.nextButton, 'disabled', true);
 
                     return;
@@ -304,19 +332,53 @@ define([
                     return !!this.reportParams.get(item);
                 }, this);
             },
-            initGp: function() {
+            publishTool: function(evt) {
+                // summary:
+                //      publishes the event that a user wants to define their area of interest
+                // evt: button click event
+                console.log(this.declaredClass + "::publishTool", arguments);
+
+                var node = evt.target,
+                    prop = node.getAttribute("data-prop"),
+                    value = null;
+
+                value = node.getAttribute("data-" + prop);
+
+                topic.publish('app/enable-tool', value);
+            },
+            initReportType: function() {
+                // summary:
+                //      sets up the gp for the report type
+                console.log(this.declaredClass + "::initReportType", arguments);
+
+                this.showNextPage();
+
+                var url;
+
+                switch (this.reportParams.get("type")) {
+                    case "main":
+                        url = AGRC.urls.mainReport;
+                        break;
+                    case "catex":
+                        url = AGRC.urls.catexReport;
+                        break;
+                }
+
+                this.initGp(url);
+            },
+            initGp: function(url) {
                 // summary:
                 //      description
                 console.info(this.declaredClass + "::initGp", arguments);
 
-                // this.gp = new Geoprocessor(AGRC.urls.downloadGp);
+                this.gp = new Geoprocessor(url);
 
-                // this.own(
-                //     this.gp.on('job-complete', lang.hitch(this, 'gpComplete')),
-                //     this.gp.on('status-update', lang.hitch(this, 'statusUpdate')),
-                //     this.gp.on('get-result-data-complete', lang.hitch(this, 'displayLink')),
-                //     this.gp.on('job-cancel', lang.hitch(this, 'jobCancelled'))
-                // );
+                this.own(
+                    this.gp.on('job-complete', lang.hitch(this, 'gpComplete')),
+                    this.gp.on('status-update', lang.hitch(this, 'statusUpdate')),
+                    this.gp.on('get-result-data-complete', lang.hitch(this, 'displayLink')),
+                    this.gp.on('job-cancel', lang.hitch(this, 'jobCancelled'))
+                );
             },
             submitJob: function() {
                 // summary:
@@ -324,7 +386,7 @@ define([
                 console.log(this.declaredClass + "::submitJob", arguments);
 
                 if (!this.valid()) {
-                    this.messagebox.innerHTML = "You haven't selected all the parts.";
+                    this.messagebox.innerHTML = "You haven't chosen all the required parts.";
                     return;
                 }
 
@@ -349,7 +411,24 @@ define([
                 //      cancels the download job
                 console.log(this.declaredClass + "::cancelJob", arguments);
 
-                this.gp.cancelJob(this.jobId);
+                domAttr.set(this.cancelButton, 'disabled', null);
+                domClass.add(this.cancelButton, 'hidden');
+
+                domAttr.set(this.downloadButton, 'disabled', null);
+                domClass.add(this.downloadButton, 'hidden');
+
+                domAttr.remove(this.backButton, 'disabled');
+                domClass.remove(this.backButton, 'hidden');
+
+                domAttr.remove(this.submitButton, 'disabled');
+                domClass.remove(this.submitButton, 'hidden');
+
+                this.messagebox.innerHTML = "";
+
+                console.log('canceling job');
+                try {
+                    this.gp.cancelJob(this.jobId);
+                } catch (a) {}
             },
             jobCancelled: function() {
                 // summary:
@@ -373,7 +452,7 @@ define([
                         this.downloadButton.innerHTML = 'Processing';
                         break;
                     case 'esriJobSucceeded':
-                        this.downloadButton.innerHTML = 'Download';
+                        this.downloadButton.innerHTML = 'Requesting Report Url';
                         break;
                 }
             },
@@ -399,7 +478,11 @@ define([
                         domClass.add(this.downloadButton, 'hidden');
                         break;
                     case 'esriJobSucceeded':
-                        this.gp.getResultData(status.jobInfo.jobId, 'zip');
+                        this.gp.getResultData(status.jobInfo.jobId, 'url', null, lang.hitch(this,
+                            function(eb) {
+                                console.log(eb);
+                                this.messagebox.innerHTML = eb;
+                            }));
                         break;
                     case 'esriJobFailed':
                         domClass.remove(this.backButton, 'hidden');

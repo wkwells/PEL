@@ -28,7 +28,9 @@ function (
         exportWebMapUrl: 'http://mapserv.utah.gov/arcgis/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task',
 
         urls: {
-            vector: 'http://mapserv.utah.gov/arcgis/rest/services/BaseMaps/Vector/MapServer'
+            vector: 'http://mapserv.utah.gov/arcgis/rest/services/BaseMaps/Vector/MapServer',
+            mainReport: '/arcgis/rest/services/PEL/Toolbox/GPServer/PEL_Main',
+            catexReport: '/arcgis/rest/services/PEL/Toolbox/GPServer/PEL_CatEx'
         }
     };
 
