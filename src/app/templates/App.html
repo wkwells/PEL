@@ -5,14 +5,15 @@
                 <span class='title'>UDOT PEL Application</span>
                 <a data-dojo-attach-point='version' class='version' href='ChangeLog.html'></a>
             </h1>
-            <img src="app/resources/agrc_logo.jpg" alt="agrc logo">
+            <img src='app/resources/udot_logo.png' alt='agrc logo'>
         </div>
         <div data-dojo-attach-point='sideBar' class='side-bar' data-dojo-type='dijit.layout.ContentPane' data-dojo-props="region:'left'">
             <div class='side-bar-sizer'>
                 <div class='padder'>
-                    Data and services provided by <a href="http://gis.utah.gov">Utah AGRC</a>
-                    <div data-dojo-attach-point="printDiv"></div>
-                    <div class='alert alert-info' data-dojo-attach-point='popupBlurb'>You may need to disable pop-up blockers to open the printout.</div>
+                    Data and services provided by <a href='http://gis.utah.gov'>Utah AGRC</a>
+
+                    <h4>Generate Report</h4>
+                    <div data-dojo-attach-point='reportNode'></div>
 
                     <h4>Find Address</h4>
                     <div data-dojo-attach-point='geocodeNode'></div>

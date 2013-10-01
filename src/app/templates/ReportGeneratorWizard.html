@@ -1,49 +1,49 @@
 <div>
-  <form data-dojo-attach-point="wizard" data-dojo-attach-event='submit: validate'>
-    <div data-dojo-type="dijit/layout/StackContainer" style="padding: 0px 9px;" data-dojo-attach-point="sc" class="wizard-container">
-      <div data-dojo-type="dijit/layout/ContentPane" data-dojo-attach-point="cp1" class="wizard-container">
-       <div class="form-group">
+  <form data-dojo-attach-point='wizard' data-dojo-attach-event='submit: validate'>
+    <div data-dojo-type='dijit/layout/StackContainer' style='padding: 0px 9px;' data-dojo-attach-point='sc' class='wizard-container'>
+      <div data-dojo-type='dijit/layout/ContentPane' data-dojo-attach-point='cp1' class='wizard-container'>
+       <div class='form-group'>
         <label>What type of report?</label>
-        <div class="btn-toolbar">
-          <div class="btn-group">
-            <button type="button" class="btn btn-default" data-prop="type" data-type="main" data-dojo-attach-event="click: updateParams">Main</button>
-            <button type="button" class="btn btn-default" data-prop="type" data-type="catex" data-dojo-attach-event="click: updateParams">Categorical Exclusions</button>
+        <div class='btn-toolbar'>
+          <div class='btn-group'>
+            <button type='button' class='btn btn-default btn-sm' data-prop='type' data-type='main' data-dojo-attach-event='click: updateParams'>Main</button>
+            <button type='button' class='btn btn-default btn-sm' data-prop='type' data-type='catex' data-dojo-attach-event='click: updateParams'>Categorical Exclusions</button>
           </div>
         </div>
       </div>
     </div>
-    <div data-dojo-type="dijit/layout/ContentPane" data-dojo-attach-point="cp2" class="wizard-container">
-      <div class="form-group">
+    <div data-dojo-type='dijit/layout/ContentPane' data-dojo-attach-point='cp2' class='wizard-container'>
+      <div class='form-group'>
         <label>Define your area of interest?</label>
-        <div class="btn-group">
-          <button type="button" data-dojo-attach-event="click: publishTool" data-prop="tool" data-tool="route-mile-post" class="btn btn-default">Route and milepost</button>
-          <button type="button" data-dojo-attach-event="click: publishTool" data-prop="tool" data-tool="line" class="btn btn-default">Along a line</button>
-          <button type="button" data-dojo-attach-event="click: publishTool" data-prop="tool" data-tool="polygon" class="btn btn-default">Within a polygon</button>          
+        <div class='btn-group'>
+          <button type='button' data-dojo-attach-event='click: publishTool' data-prop='tool' data-tool='route-mile-post' class='btn btn-default btn-sm'>Route and milepost</button>
+          <button type='button' data-dojo-attach-event='click: publishTool' data-prop='tool' data-tool='line' class='btn btn-default btn-sm'>Along a line</button>
+          <button type='button' data-dojo-attach-event='click: publishTool' data-prop='tool' data-tool='polygon' class='btn btn-default btn-sm'>Within a polygon</button>          
         </div>
       </div>
-      <div class="form-group">
-        <label class="control-label" data-dojo-attach-point="geometryLabel">Has Geometry: <span class="glyphicon glyphicon-exclamation-sign" data-dojo-attach-point="geometryStatus"></span></label>
+      <div class='form-group'>
+        <label class='control-label' data-dojo-attach-point='geometryLabel'>Has Geometry: <span class='glyphicon glyphicon-exclamation-sign' data-dojo-attach-point='geometryStatus'></span></label>
       </div>
-      <div class="form-group" data-dojo-attach-point="bufferGroup">
-        <label class="control-label">Geometry Buffer</label>
-        <input type="number" class="form-control" data-prop="buffer" data-dojo-attach-point="bufferInput" />
+      <div class='form-group' data-dojo-attach-point='bufferGroup'>
+        <label class='control-label'>Geometry Buffer</label>
+        <input type='number' class='form-control' data-prop='buffer' data-dojo-attach-point='bufferInput' />
       </div>
     </div>
-    <div data-dojo-type="dijit/layout/ContentPane" data-dojo-attach-point="cp3" class="wizard-container">
-      <div class="form-group">
+    <div data-dojo-type='dijit/layout/ContentPane' data-dojo-attach-point='cp3' class='wizard-container'>
+      <div class='form-group'>
         <label>Additional reporting information?</label>
         <label>Report Name</label>
-          <input type="text" class="form-control" data-prop="name" data-dojo-attach-event="keyup: updateParams"/>
+          <input type='text' class='form-control' data-prop='name' data-dojo-attach-event='keyup: updateParams'/>
         </div>
       </div>
     </div>
-    <div class='highlight text-center hidden' data-dojo-attach-point="controlPanel">
-      <button type="button" class="btn btn-default" data-dojo-attach-point="backButton" data-dojo-attach-event="click: back">Back</button>
-      <button type="button" class="btn btn-info hidden" disabled data-dojo-attach-point="nextButton" data-dojo-attach-event="click: next">Next</button>
-      <button type="button" class="btn btn-success hidden" data-dojo-attach-event="click: submitJob" data-dojo-attach-point="submitButton" disabled="true">Submit</button>
-      <button type="button" class="btn btn-danger hidden" data-dojo-attach-event="click: cancelJob" data-dojo-attach-point="cancelButton" disabled="true">Cancel</button>
-      <a href="#" class="btn btn-success hidden" disabled data-dojo-attach-point="downloadButton">Create</a>
-      <span class="label label-warning" data-dojo-attach-point="messagebox"></span>
+    <div class='highlight text-center hidden' data-dojo-attach-point='controlPanel'>
+      <button type='button' class='btn btn-default' data-dojo-attach-point='backButton' data-dojo-attach-event='click: back'>Back</button>
+      <button type='button' class='btn btn-info hidden' disabled data-dojo-attach-point='nextButton' data-dojo-attach-event='click: next'>Next</button>
+      <button type='button' class='btn btn-success hidden' data-dojo-attach-event='click: submitJob' data-dojo-attach-point='submitButton' disabled='true'>Submit</button>
+      <button type='button' class='btn btn-danger hidden' data-dojo-attach-event='click: cancelJob' data-dojo-attach-point='cancelButton' disabled='true'>Cancel</button>
+      <a href='#' class='btn btn-success hidden' disabled data-dojo-attach-point='downloadButton'>Create</a>
+      <span class='label label-warning' data-dojo-attach-point='messagebox'></span>
     </div>
   </form>
 </div>

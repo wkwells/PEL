@@ -53,7 +53,7 @@ define([
     ) {
         // summary:
         //      Handles retrieving and displaying the data in the popup.
-        return declare("app.ReportGeneratorWizard", [_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
+        return declare('app.ReportGeneratorWizard', [_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
             baseClass: 'report-wizard',
 
             widgetsInTemplate: true,
@@ -81,7 +81,7 @@ define([
             constructor: function() {
                 // summary:
                 //      constructor
-                console.log(this.declaredClass + "::constructor", arguments);
+                console.log(this.declaredClass + '::constructor', arguments);
 
                 this.inherited(arguments);
 
@@ -92,12 +92,12 @@ define([
                     name: null
                 });
 
-                this.numbersOnly = new RegExp("(\\d*[.])?\\d+");
+                this.numbersOnly = new RegExp('^[0-9.]+$');
             },
             postCreate: function() {
                 // summary:
                 //      dom is ready
-                console.info(this.declaredClass + "::postCreate", arguments);
+                console.info(this.declaredClass + '::postCreate', arguments);
 
                 this.inherited(arguments);
 
@@ -108,7 +108,7 @@ define([
             setupWizard: function() {
                 // summary:
                 //      sets up the wizard pane functionality
-                console.log(this.declaredClass + "::setupWizard", arguments);
+                console.log(this.declaredClass + '::setupWizard', arguments);
 
                 this.pages = [this.cp1, this.cp2, this.cp3];
 
@@ -128,7 +128,7 @@ define([
             setupConnections: function() {
                 // summary:
                 //      sets up the connections obviously
-                console.log(this.declaredClass + "::setupConnections", arguments);
+                console.log(this.declaredClass + '::setupConnections', arguments);
 
                 this.subscribe('app/report-wizard-geometry', lang.hitch(this, 'setGeometry'));
 
@@ -145,9 +145,9 @@ define([
                 // summary:
                 //      shows the next wizard panel
                 // direction: string: forward or backward. default and null is forward.
-                console.info(this.declaredClass + "::showNextPage", arguments);
+                console.info(this.declaredClass + '::showNextPage', arguments);
 
-                if (direction && direction == "back") {
+                if (direction && direction == 'back') {
                     if (this.currentPage > 0) {
                         this.currentPage--;
                     }
@@ -179,14 +179,14 @@ define([
                 }
             },
             back: function() {
-                console.info(this.declaredClass + "::back", arguments);
+                console.info(this.declaredClass + '::back', arguments);
 
-                this.showNextPage("back");
+                this.showNextPage('back');
             },
             next: function() {
                 // summary:
                 //      calls the next funciton of the current page
-                console.log(this.declaredClass + "::next", arguments);
+                console.log(this.declaredClass + '::next', arguments);
 
                 var pane = this.pages[this.currentPage];
                 pane.next();
@@ -195,7 +195,7 @@ define([
                 // summary:
                 //      generic method called from the widget pane form elements
                 // evt: the form element event. Could be click, change, keyDown, etc
-                console.log(this.declaredClass + "::updateParams", arguments);
+                console.log(this.declaredClass + '::updateParams', arguments);
 
                 var currentPage = this.pages[this.currentPage];
                 if (lang.isFunction(currentPage.updateParameters)) {
@@ -208,13 +208,13 @@ define([
                 this.showSubmitButton();
             },
             updateParamsFromButton: function(evt) {
-                console.info(this.declaredClass + "::updateParamsFromButton", arguments);
+                console.info(this.declaredClass + '::updateParamsFromButton', arguments);
 
                 var node = evt.target,
-                    prop = node.getAttribute("data-prop"),
+                    prop = node.getAttribute('data-prop'),
                     value = null;
 
-                value = node.getAttribute("data-" + prop);
+                value = node.getAttribute('data-' + prop);
 
                 this.reportParams.set(prop, value.toLowerCase());
             },
@@ -222,10 +222,10 @@ define([
                 // summary:
                 //      gets the value from a textbox
                 // evt: onchange event on a input type='text'
-                console.log(this.declaredClass + "::updateParamsFromTextBox", arguments);
+                console.log(this.declaredClass + '::updateParamsFromTextBox', arguments);
 
                 var node = evt.target,
-                    prop = node.getAttribute("data-prop"),
+                    prop = node.getAttribute('data-prop'),
                     value = null;
 
                 value = node.value.toLowerCase();
@@ -236,7 +236,7 @@ define([
                 // summary:
                 //      topic subscription to geometry drawing
                 // geom: the geometry of the shape to use for the report
-                console.log(this.declaredClass + "::setGeometry", arguments);
+                console.log(this.declaredClass + '::setGeometry', arguments);
 
                 // set the geometry
                 this.reportParams.set('geometry', geom);
@@ -244,16 +244,16 @@ define([
             displayGeometryConfirmation: function() {
                 // summary:
                 //      handles the toggling of the has geometry flag in the wizard
-                console.log(this.declaredClass + "::displayGeometryConfirmation", arguments);
+                console.log(this.declaredClass + '::displayGeometryConfirmation', arguments);
 
                 var cssState = this.reportParams.get('geometry') === null ? 'glyphicon-exclamation-sign' : 'glyphicon-ok-sign';
 
-                domClass.replace(this.geometryStatus, "glyphicon " + cssState);
+                domClass.replace(this.geometryStatus, 'glyphicon ' + cssState);
             },
             validateGeometryPane: function(cb) {
                 // summary:
                 //      validates the unique geometry view
-                console.log(this.declaredClass + "::validateGeometryPane", arguments);
+                console.log(this.declaredClass + '::validateGeometryPane', arguments);
 
                 var buffer = this.reportParams.get('buffer');
 
@@ -274,13 +274,13 @@ define([
             setupWizardPane: function() {
                 // summary:
                 //      handles the state of the pane and it's buttons
-                console.log(this.declaredClass + "::setupWizardPane", arguments);
+                console.log(this.declaredClass + '::setupWizardPane', arguments);
 
                 this.showSubmitButton();
                 this.showNextButton();
             },
             showSubmitButton: function() {
-                console.info(this.declaredClass + "::showSubmitButton", arguments);
+                console.info(this.declaredClass + '::showSubmitButton', arguments);
 
                 if (!this.valid()) {
                     console.log('::showSubmitButton::!valid');
@@ -297,7 +297,7 @@ define([
             showNextButton: function() {
                 // summary:
                 //      shows the next button on the content pane
-                console.log(this.declaredClass + "::showNextButton", arguments);
+                console.log(this.declaredClass + '::showNextButton', arguments);
 
                 var pane = this.pages[this.currentPage];
 
@@ -313,7 +313,7 @@ define([
                 domClass.remove(this.nextButton, 'hidden');
             },
             validate: function(evt) {
-                console.info(this.declaredClass + "::validate", arguments);
+                console.info(this.declaredClass + '::validate', arguments);
 
                 if (!this.valid()) {
                     domClass.add(this.submitButton, 'hidden');
@@ -326,7 +326,7 @@ define([
             valid: function() {
                 // summary:
                 //      validates the download object
-                console.log(this.declaredClass + "::valid", arguments);
+                console.log(this.declaredClass + '::valid', arguments);
 
                 return array.every(this.validationProps, function(item) {
                     return !!this.reportParams.get(item);
@@ -336,30 +336,30 @@ define([
                 // summary:
                 //      publishes the event that a user wants to define their area of interest
                 // evt: button click event
-                console.log(this.declaredClass + "::publishTool", arguments);
+                console.log(this.declaredClass + '::publishTool', arguments);
 
                 var node = evt.target,
-                    prop = node.getAttribute("data-prop"),
+                    prop = node.getAttribute('data-prop'),
                     value = null;
 
-                value = node.getAttribute("data-" + prop);
+                value = node.getAttribute('data-' + prop);
 
                 topic.publish('app/enable-tool', value);
             },
             initReportType: function() {
                 // summary:
                 //      sets up the gp for the report type
-                console.log(this.declaredClass + "::initReportType", arguments);
+                console.log(this.declaredClass + '::initReportType', arguments);
 
                 this.showNextPage();
 
                 var url;
 
-                switch (this.reportParams.get("type")) {
-                    case "main":
+                switch (this.reportParams.get('type')) {
+                    case 'main':
                         url = AGRC.urls.mainReport;
                         break;
-                    case "catex":
+                    case 'catex':
                         url = AGRC.urls.catexReport;
                         break;
                 }
@@ -369,7 +369,7 @@ define([
             initGp: function(url) {
                 // summary:
                 //      description
-                console.info(this.declaredClass + "::initGp", arguments);
+                console.info(this.declaredClass + '::initGp', arguments);
 
                 this.gp = new Geoprocessor(url);
 
@@ -383,15 +383,16 @@ define([
             submitJob: function() {
                 // summary:
                 //      sends the download filter to the gp service
-                console.log(this.declaredClass + "::submitJob", arguments);
+                console.log(this.declaredClass + '::submitJob', arguments);
 
                 if (!this.valid()) {
                     this.messagebox.innerHTML = "You haven't chosen all the required parts.";
                     return;
                 }
 
-                this.messagebox.innerHTML = "";
+                this.messagebox.innerHTML = '';
                 this.downloadButton.innerHTML = 'Submitting';
+                
                 this.gp.submitJob(this.reportPar);
 
                 domClass.remove(this.cancelButton, 'hidden');
@@ -409,7 +410,7 @@ define([
             cancelJob: function() {
                 // summary:
                 //      cancels the download job
-                console.log(this.declaredClass + "::cancelJob", arguments);
+                console.log(this.declaredClass + '::cancelJob', arguments);
 
                 domAttr.set(this.cancelButton, 'disabled', null);
                 domClass.add(this.cancelButton, 'hidden');
@@ -423,26 +424,27 @@ define([
                 domAttr.remove(this.submitButton, 'disabled');
                 domClass.remove(this.submitButton, 'hidden');
 
-                this.messagebox.innerHTML = "";
+                this.messagebox.innerHTML = '';
 
                 console.log('canceling job');
                 try {
+                    //throws error if it's already done and you try to cancel
                     this.gp.cancelJob(this.jobId);
                 } catch (a) {}
             },
             jobCancelled: function() {
                 // summary:
                 //      successful cancel
-                console.log(this.declaredClass + "::jobCancelled", arguments);
+                console.log(this.declaredClass + '::jobCancelled', arguments);
             },
             statusUpdate: function(status) {
                 // summary:
                 //      status updates from the gp service
                 // jobinfo: esri/tasks/JobInfo
-                console.log(this.declaredClass + "::statusUpdate", arguments);
+                console.log(this.declaredClass + '::statusUpdate', arguments);
 
                 this.jobId = status.jobInfo.jobId;
-                this.messagebox.innerHTML = "";
+                this.messagebox.innerHTML = '';
 
                 switch (status.jobInfo.jobStatus) {
                     case 'esriJobSubmitted':
@@ -460,7 +462,7 @@ define([
                 // summary:
                 //      description
                 // status: esri/tasks/JobInfo
-                console.log(this.declaredClass + "::gpComplete", arguments);
+                console.log(this.declaredClass + '::gpComplete', arguments);
 
                 switch (status.jobInfo.jobStatus) {
                     case 'esriJobCancelling':
@@ -506,7 +508,7 @@ define([
                 // summary:
                 //      sets the download link's href
                 // data: the esri/tasks/ParameterInfo object
-                console.log(this.declaredClass + "::displayLink", arguments);
+                console.log(this.declaredClass + '::displayLink', arguments);
 
                 this.set('downloadUrl', response.result.value.url);
 
