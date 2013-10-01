@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TEST: ReportGeneratorWizard</title>
+    
+    <link rel='stylesheet' href='http://js.arcgis.com/3.6/js/dojo/dijit/themes/claro/claro.css'>
+    <link rel="stylesheet" type="text/css" href="http://js.arcgis.com/3.6/js/esri/css/esri.css" />
+    <link href="../../bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link rel='stylesheet' href='../../app/resources/app.css'>
+    <link rel="stylesheet" href='../../app/resources/ReportGeneratorWizard.css'>
+    <style>
+    .report-wizard{
+        width: 400px;
+        border: 1px black solid;
+        }
+        </style>
+        <!-- JAVASCRIPT -->
+        <script src='http://js.arcgis.com/3.6'></script>
+        <script type="text/javascript">
+        var projectUrl = location.pathname.replace(/\/[^\/]+$/, "") + '/';
+        var widgetUnderTest;
+
+        require({
+                packages: [{
+                    name: 'app',
+                    location: projectUrl + '../../app'
+                }, {
+                    name: 'agrc',
+                    location: projectUrl + '../../agrc'
+                }]
+            }, [
+                'app/ReportGeneratorWizard',
+                
+                'dojo/dom',
+                'dojo/topic',
+                'dojo/on',
+
+                'dojo/domReady!'
+            ],
+            function(Module, dom, topic, on) {
+                widgetUnderTest = new Module({}, contentNode);
+
+                on(dom.byId("btn"), "click", function(){
+                    topic.publish('app/report-wizard-geometry', {geom: [1,2,3]});
+                })
+            });
+        </script>
+    </head>
+    <body>
+        <h3>
+            app/ReportGeneratorWizard
+        </h3>
+        <div id="contentNode">
+        </div>
+
+    <input type="button" id="btn" value="geometry set"></button>
+    <script src="../../jquery/jquery.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="../../bootstrap/js/bootstrap.js"></script>
+</body>
+</html>
