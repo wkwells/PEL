@@ -6,8 +6,7 @@
 @import '../../agrc/resources/map/BaseMapSelector.css';
 @import '../../agrc/resources/locate/FindAddress.css';
 @import '../../agrc/resources/locate/MagicZoom.css';
-/*@import '../../bootstrap/css/bootstrap.css';*/
-@import '../../bootstrap/css/bootstrap-theme.css';
+@import '../../bootstrap/css/bootstrap.css';
 @import '../../app/resources/ReportGeneratorWizard.css';
 
 body, html, .app {
@@ -93,4 +92,19 @@ body, html, .app {
 /* remove orange outline in chrome */
 *:focus {
     outline: none;
+}
+
+.map .tooltip {
+    width: 100px;
+    position: absolute;
+    border: 1px solid #7EABCD;
+    background-color: white;
+    padding: 5px;
+    font-size: 9pt;
+    z-index: 9999;
+    -o-border-radius: 4px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    opacity: 1;
 }

@@ -342,6 +342,13 @@ define([
                     prop = node.getAttribute('data-prop'),
                     value = null;
 
+                if (this.activeTool) {
+                    domClass.remove(this.activeTool, 'btn-primary');
+                }
+
+                this.activeTool = node;
+                domClass.add(this.activeTool, 'btn-primary');
+
                 value = node.getAttribute('data-' + prop);
 
                 topic.publish('app/enable-tool', value);
@@ -392,7 +399,7 @@ define([
 
                 this.messagebox.innerHTML = '';
                 this.downloadButton.innerHTML = 'Submitting';
-                
+
                 this.gp.submitJob(this.reportPar);
 
                 domClass.remove(this.cancelButton, 'hidden');
@@ -480,11 +487,16 @@ define([
                         domClass.add(this.downloadButton, 'hidden');
                         break;
                     case 'esriJobSucceeded':
-                        this.gp.getResultData(status.jobInfo.jobId, 'url', null, lang.hitch(this,
-                            function(eb) {
-                                console.log(eb);
-                                this.messagebox.innerHTML = eb;
-                            }));
+                        this.gp.getResultData(status.jobInfo.jobId, 'url',
+                            function() {
+                                topic.publish('app/wizard-reset');
+                            },
+                            lang.hitch(this,
+                                function(eb) {
+                                    console.log(eb);
+                                    this.messagebox.innerHTML = eb;
+                                })
+                        );
                         break;
                     case 'esriJobFailed':
                         domClass.remove(this.backButton, 'hidden');
@@ -508,6 +520,8 @@ define([
                 // summary:
                 //      sets the download link's href
                 // data: the esri/tasks/ParameterInfo object
+
+                //TODO: this.reset wizard
                 console.log(this.declaredClass + '::displayLink', arguments);
 
                 this.set('downloadUrl', response.result.value.url);
