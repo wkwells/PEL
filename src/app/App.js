@@ -200,7 +200,7 @@ define([
 
                 this.map.graphics.add(this.activeGraphic);
 
-                topic.publish('app/report-wizard-geometry', this.activeGraphic.geometry.toJson());
+                topic.publish('app/report-wizard-geometry', this.activeGraphic.geometry);
             },
             initMap: function() {
                 // summary:

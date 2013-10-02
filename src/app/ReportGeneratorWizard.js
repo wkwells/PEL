@@ -22,7 +22,9 @@ define([
         'dijit/layout/ContentPane',
         'dijit/_WidgetsInTemplateMixin',
 
-        'esri/tasks/Geoprocessor'
+        'esri/tasks/Geoprocessor',
+        'esri/tasks/FeatureSet',
+        'esri/graphic'
     ],
 
     function(
@@ -49,7 +51,9 @@ define([
         ContentPane,
         _WidgetsInTemplateMixin,
 
-        Geoprocessor
+        Geoprocessor,
+        FeatureSet,
+        Graphic
     ) {
         // summary:
         //      Handles retrieving and displaying the data in the popup.
@@ -400,7 +404,9 @@ define([
                 this.messagebox.innerHTML = '';
                 this.downloadButton.innerHTML = 'Submitting';
 
-                this.gp.submitJob(this.reportPar);
+                var gpObject = this.transformObjectForGp();
+
+                this.gp.submitJob(gpObject);
 
                 domClass.remove(this.cancelButton, 'hidden');
                 domAttr.set(this.cancelButton, 'disabled', false);
@@ -413,6 +419,75 @@ define([
 
                 domAttr.set(this.downloadButton, 'disabled', null);
                 domClass.remove(this.downloadButton, 'hidden');
+            },
+            transformObjectForGp: function() {
+                // summary:
+                //      transforms wizard params to be accepted by the gp service
+                // 
+                console.log(this.declaredClass + '::transformObjectForGp', arguments);
+
+                //don't hate me since i copied this from bio-hazard
+                var start = new Date();
+
+                var dd = start.getDate() + '';
+                if (dd < 10) {
+                    dd = '0' + dd;
+                }
+
+                var mm = start.getMonth() + 1 + '';
+                if (mm < 10) {
+                    mm = '0' + mm;
+                }
+
+                var yyyy = start.getFullYear() + '';
+
+                var hh = start.getHours();
+                if (hh < 10) {
+                    hh = '0' + hh;
+                }
+
+                var minutes = start.getMinutes();
+                if (minutes < 10) {
+                    minutes = '0' + minutes;
+                }
+
+                var monthNames = new Array('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
+                var suffix = dd + monthNames[start.getMonth()] + yyyy + "_" + hh + minutes;
+
+                //Set units to feet
+                var units = 'feet';
+
+                //Acquire the report title from the user via window prompts
+                var reportName = this.reportParams.get('name');
+                var prjID = reportName.slice(0, 15) + ' ' + suffix;
+
+                var features = [];
+                var graphic = new Graphic(this.reportParams.get('geometry'));
+                features.push(graphic);
+                var featureVar = new FeatureSet();
+                featureVar.features = features;
+
+                return graphic.geometry.type === 'polyline' ? {
+                    "Project_Name": reportName,
+                    "Project_ID": prjID,
+                    "Dynamic_Project_Drawing": featureVar,
+                    "Buffer_Distance": this.reportParams.get('buffer'),
+                    "Units_for_Buffer_Distance": units,
+                    "Line_Source_Option": 3,
+                    "Polygon_Source_Option": 0,
+                    "Input_Fields": 1
+                } : {
+                    'Project_Name': reportName,
+                    'Project_ID': prjID,
+                    'Dynamic_Project_Drawing': featureVar,
+                    'Buffer_Distance': 0,
+                    'Units_for_Buffer_Distance': units,
+                    'Line_Source_Option': 0,
+                    'Polygon_Source_Option': 3,
+                    'Input_Fields': 0
+                };
+
+
             },
             cancelJob: function() {
                 // summary:
