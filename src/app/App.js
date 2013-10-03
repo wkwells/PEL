@@ -172,11 +172,9 @@ define([
                         //TODO:nmake route milepost widget do something
                         break;
                     case 'line':
-                        //TODO: activate line tool
                         this.drawingToolbar.activate(Draw.POLYLINE);
                         break;
                     case 'polygon':
-                        //TODO: activate the polygon tool
                         this.drawingToolbar.activate(Draw.POLYGON);
                         break;
                 }
@@ -212,7 +210,7 @@ define([
                 });
 
                 this.graphicSymbol = new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
-                    new Color("428bca"), 3);
+                    new Color('428bca'), 3);
 
                 var selector;
 

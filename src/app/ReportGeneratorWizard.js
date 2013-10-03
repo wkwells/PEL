@@ -397,7 +397,7 @@ define([
                 console.log(this.declaredClass + '::submitJob', arguments);
 
                 if (!this.valid()) {
-                    this.messagebox.innerHTML = "You haven't chosen all the required parts.";
+                    this.messagebox.innerHTML = 'You haven\'t chosen all the required parts.';
                     return;
                 }
 
@@ -451,8 +451,8 @@ define([
                     minutes = '0' + minutes;
                 }
 
-                var monthNames = new Array('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
-                var suffix = dd + monthNames[start.getMonth()] + yyyy + "_" + hh + minutes;
+                var monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                var suffix = dd + monthNames[start.getMonth()] + yyyy + '_' + hh + minutes;
 
                 //Set units to feet
                 var units = 'feet';
@@ -467,27 +467,25 @@ define([
                 var featureVar = new FeatureSet();
                 featureVar.features = features;
 
-                return graphic.geometry.type === 'polyline' ? {
-                    "Project_Name": reportName,
-                    "Project_ID": prjID,
-                    "Dynamic_Project_Drawing": featureVar,
-                    "Buffer_Distance": this.reportParams.get('buffer'),
-                    "Units_for_Buffer_Distance": units,
-                    "Line_Source_Option": 3,
-                    "Polygon_Source_Option": 0,
-                    "Input_Fields": 1
-                } : {
+                var gpObject = {
                     'Project_Name': reportName,
                     'Project_ID': prjID,
                     'Dynamic_Project_Drawing': featureVar,
-                    'Buffer_Distance': 0,
                     'Units_for_Buffer_Distance': units,
+                    'Buffer_Distance': 0,
                     'Line_Source_Option': 0,
                     'Polygon_Source_Option': 3,
                     'Input_Fields': 0
                 };
 
+                if(graphic.geometry.type === 'polyline') {
+                    gpObject.Buffer_Distance = this.reportParams.get('buffer');
+                    gpObject.Line_Source_Option = 3;
+                    gpObject.Polygon_Source_Option = 0;
+                    gpObject.Input_Fields = 1;
+                }
 
+                return gpObject;
             },
             cancelJob: function() {
                 // summary:
@@ -586,7 +584,7 @@ define([
                         domAttr.set(this.downloadButton, 'disabled', true);
                         domClass.add(this.downloadButton, 'hidden');
 
-                        this.messagebox.innerHTML = "I'm sorry but the job failed.";
+                        this.messagebox.innerHTML = 'I\'m sorry but the job failed.';
 
                         break;
                 }
