@@ -26,7 +26,7 @@ Evaluate inputed areas for potential natural and social environmental impacts.
 #------------------------------------------------------------------
 
 # Import ESRI modules
-# import arcpy as ap
+import arcpy as ap
 
 # # Import system modules
 # import os
@@ -55,7 +55,8 @@ Evaluate inputed areas for potential natural and social environmental impacts.
 
 
 def main():
-    pass
+    ap.SetParameterAsText(8, "/fakeurl.pdf")
+
 #     """Execute PEL tasks"""
 
 #     # Start of the analysis, runtime
