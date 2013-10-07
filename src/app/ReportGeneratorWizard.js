@@ -22,7 +22,9 @@ define([
         'dijit/layout/ContentPane',
         'dijit/_WidgetsInTemplateMixin',
 
-        'esri/tasks/Geoprocessor'
+        'esri/tasks/Geoprocessor',
+        'esri/tasks/FeatureSet',
+        'esri/graphic'
     ],
 
     function(
@@ -49,7 +51,9 @@ define([
         ContentPane,
         _WidgetsInTemplateMixin,
 
-        Geoprocessor
+        Geoprocessor,
+        FeatureSet,
+        Graphic
     ) {
         // summary:
         //      Handles retrieving and displaying the data in the popup.
@@ -342,6 +346,13 @@ define([
                     prop = node.getAttribute('data-prop'),
                     value = null;
 
+                if (this.activeTool) {
+                    domClass.remove(this.activeTool, 'btn-primary');
+                }
+
+                this.activeTool = node;
+                domClass.add(this.activeTool, 'btn-primary');
+
                 value = node.getAttribute('data-' + prop);
 
                 topic.publish('app/enable-tool', value);
@@ -386,14 +397,16 @@ define([
                 console.log(this.declaredClass + '::submitJob', arguments);
 
                 if (!this.valid()) {
-                    this.messagebox.innerHTML = "You haven't chosen all the required parts.";
+                    this.messagebox.innerHTML = 'You haven\'t chosen all the required parts.';
                     return;
                 }
 
                 this.messagebox.innerHTML = '';
                 this.downloadButton.innerHTML = 'Submitting';
-                
-                this.gp.submitJob(this.reportPar);
+
+                var gpObject = this.transformObjectForGp();
+
+                this.gp.submitJob(gpObject);
 
                 domClass.remove(this.cancelButton, 'hidden');
                 domAttr.set(this.cancelButton, 'disabled', false);
@@ -406,6 +419,73 @@ define([
 
                 domAttr.set(this.downloadButton, 'disabled', null);
                 domClass.remove(this.downloadButton, 'hidden');
+            },
+            transformObjectForGp: function() {
+                // summary:
+                //      transforms wizard params to be accepted by the gp service
+                // 
+                console.log(this.declaredClass + '::transformObjectForGp', arguments);
+
+                //don't hate me since i copied this from bio-hazard
+                var start = new Date();
+
+                var dd = start.getDate() + '';
+                if (dd < 10) {
+                    dd = '0' + dd;
+                }
+
+                var mm = start.getMonth() + 1 + '';
+                if (mm < 10) {
+                    mm = '0' + mm;
+                }
+
+                var yyyy = start.getFullYear() + '';
+
+                var hh = start.getHours();
+                if (hh < 10) {
+                    hh = '0' + hh;
+                }
+
+                var minutes = start.getMinutes();
+                if (minutes < 10) {
+                    minutes = '0' + minutes;
+                }
+
+                var monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                var suffix = dd + monthNames[start.getMonth()] + yyyy + '_' + hh + minutes;
+
+                //Set units to feet
+                var units = 'feet';
+
+                //Acquire the report title from the user via window prompts
+                var reportName = this.reportParams.get('name');
+                var prjID = reportName.slice(0, 15) + ' ' + suffix;
+
+                var features = [];
+                var graphic = new Graphic(this.reportParams.get('geometry'));
+                features.push(graphic);
+                var featureVar = new FeatureSet();
+                featureVar.features = features;
+
+                var gpObject = {
+                    'Project_Name': reportName,
+                    'Project_ID': prjID,
+                    'Dynamic_Project_Drawing': featureVar,
+                    'Units_for_Buffer_Distance': units,
+                    'Buffer_Distance': 0,
+                    'Line_Source_Option': 0,
+                    'Polygon_Source_Option': 3,
+                    'Input_Fields': 0
+                };
+
+                if(graphic.geometry.type === 'polyline') {
+                    gpObject.Buffer_Distance = this.reportParams.get('buffer');
+                    gpObject.Line_Source_Option = 3;
+                    gpObject.Polygon_Source_Option = 0;
+                    gpObject.Input_Fields = 1;
+                }
+
+                return gpObject;
             },
             cancelJob: function() {
                 // summary:
@@ -480,11 +560,16 @@ define([
                         domClass.add(this.downloadButton, 'hidden');
                         break;
                     case 'esriJobSucceeded':
-                        this.gp.getResultData(status.jobInfo.jobId, 'url', null, lang.hitch(this,
-                            function(eb) {
-                                console.log(eb);
-                                this.messagebox.innerHTML = eb;
-                            }));
+                        this.gp.getResultData(status.jobInfo.jobId, 'url',
+                            function() {
+                                topic.publish('app/wizard-reset');
+                            },
+                            lang.hitch(this,
+                                function(eb) {
+                                    console.log(eb);
+                                    this.messagebox.innerHTML = eb;
+                                })
+                        );
                         break;
                     case 'esriJobFailed':
                         domClass.remove(this.backButton, 'hidden');
@@ -499,7 +584,7 @@ define([
                         domAttr.set(this.downloadButton, 'disabled', true);
                         domClass.add(this.downloadButton, 'hidden');
 
-                        this.messagebox.innerHTML = "I'm sorry but the job failed.";
+                        this.messagebox.innerHTML = 'I\'m sorry but the job failed.';
 
                         break;
                 }
@@ -508,6 +593,8 @@ define([
                 // summary:
                 //      sets the download link's href
                 // data: the esri/tasks/ParameterInfo object
+
+                //TODO: this.reset wizard
                 console.log(this.declaredClass + '::displayLink', arguments);
 
                 this.set('downloadUrl', response.result.value.url);

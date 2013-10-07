@@ -2,10 +2,19 @@ define([
         'dojo/text!app/templates/App.html',
 
         'dojo/_base/declare',
-        
+        'dojo/_base/lang',
+        'dojo/_base/Color',
+
+        'dojo/topic',
+        'dojo/aspect',
+
         'dijit/_WidgetBase',
         'dijit/_TemplatedMixin',
         'dijit/_WidgetsInTemplateMixin',
+
+        'esri/toolbars/draw',
+        'esri/graphic',
+        'esri/symbols/SimpleLineSymbol',
 
         'agrc/widgets/map/BaseMap',
         'agrc/widgets/locate/FindAddress',
@@ -16,19 +25,29 @@ define([
 
         'app/reportGeneratorWizard',
 
+        //no mapping
         'dijit/layout/BorderContainer',
         'dijit/layout/ContentPane'
     ],
 
     function(
         template,
-        
+
         declare,
+        lang,
+        Color,
+
+        topic,
+        aspect,
 
         _WidgetBase,
         _TemplatedMixin,
         _WidgetsInTemplateMixin,
-        
+
+        Draw,
+        Graphic,
+        SimpleLineSymbol,
+
         BaseMap,
         FindAddress,
         MagicZoom,
@@ -45,11 +64,14 @@ define([
             widgetsInTemplate: true,
 
             templateString: template,
-            
+
             baseClass: 'app',
 
             // map: agrc.widgets.map.Basemap
             map: null,
+
+            //esri/toolbars/draw
+            drawingToolbar: null,
 
             constructor: function() {
                 // summary:
@@ -120,7 +142,63 @@ define([
 
                 wizard = new Wizard({}, this.reportNode);
 
+                this.setupConnections();
+
                 this.inherited(arguments);
+            },
+            setupConnections: function() {
+                // summary:
+                //      sets up the topics and ons and aspects
+                // 
+                console.log(this.declaredClass + '::setupConnections', arguments);
+
+                topic.subscribe('app/enable-tool', lang.hitch(this, 'activateTool'));
+                topic.subscribe('app/wizard-reset', lang.hitch(this, 'removeGraphic'));
+                
+                this.drawingToolbar.on('draw-end', lang.hitch(this, 'publishGraphic'));
+            },
+            activateTool: function(tool) {
+                // summary:
+                //      handles the topic app/enable-tool
+                // tool: string: route-mile-post, line, polygon
+                console.log(this.declaredClass + '::activateTool', arguments);
+
+                if (!tool) {
+                    return;
+                }
+
+                switch (tool) {
+                    case 'route-mile-post':
+                        //TODO:nmake route milepost widget do something
+                        break;
+                    case 'line':
+                        this.drawingToolbar.activate(Draw.POLYLINE);
+                        break;
+                    case 'polygon':
+                        this.drawingToolbar.activate(Draw.POLYGON);
+                        break;
+                }
+            },
+            publishGraphic: function(evt) {
+                // summary:
+                //      handles the toolbars draw-end event.
+                // evt
+                console.log(this.declaredClass + '::publishGraphic', arguments);
+
+                if (!evt || !evt.geometry) {
+                    return;
+                }
+
+                if (this.activeGraphic) {
+                    this.map.graphics.remove(this.activeGraphic);
+                    this.activeGraphic = null;
+                }
+
+                this.activeGraphic = new Graphic(evt.geometry, this.graphicSymbol);
+
+                this.map.graphics.add(this.activeGraphic);
+
+                topic.publish('app/report-wizard-geometry', this.activeGraphic.geometry);
             },
             initMap: function() {
                 // summary:
@@ -131,6 +209,9 @@ define([
                     useDefaultBaseMap: false
                 });
 
+                this.graphicSymbol = new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
+                    new Color('428bca'), 3);
+
                 var selector;
 
                 selector = new BaseMapSelector({
@@ -138,6 +219,15 @@ define([
                     id: 'claro',
                     position: 'TR'
                 });
+
+                this.drawingToolbar = new Draw(this.map);
+            },
+            removeGraphic: function() {
+                // summary:
+                //      removes the map graphic
+                console.log(this.declaredClass + '::removeGraphic', arguments);
+
+                this.map.graphics.remove(this.activeGraphic);
             }
         });
     });
