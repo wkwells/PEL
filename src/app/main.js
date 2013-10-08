@@ -15,6 +15,11 @@ function (
         //      global reference to App
         app: null,
 
+        // appName: String
+        //      The name of the app in permissions proxy.
+        //      See the LoginRegister widget
+        appName: 'pel',
+
         // version: String
         //      The version number.
         version: '0.1.0',

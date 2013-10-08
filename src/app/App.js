@@ -4,10 +4,12 @@ define([
         'dojo/_base/declare',
         'dojo/_base/lang',
         'dojo/_base/Color',
+        'dojo/_base/window',
 
         'dojo/topic',
         'dojo/aspect',
-
+        'dojo/dom-construct',
+        
         'dijit/_WidgetBase',
         'dijit/_TemplatedMixin',
         'dijit/_WidgetsInTemplateMixin',
@@ -22,6 +24,7 @@ define([
         'agrc/widgets/map/BaseMapSelector',
 
         'ijit/widgets/layout/SideBarToggler',
+        'ijit/widgets/LoginRegister',
 
         'app/reportGeneratorWizard',
 
@@ -36,9 +39,11 @@ define([
         declare,
         lang,
         Color,
+        win,
 
         topic,
         aspect,
+        domConstruct,
 
         _WidgetBase,
         _TemplatedMixin,
@@ -54,6 +59,7 @@ define([
         BaseMapSelector,
 
         SideBarToggler,
+        LoginRegister,
 
         Wizard
     ) {
@@ -91,6 +97,11 @@ define([
                 this.version.innerHTML = AGRC.version;
 
                 this.inherited(arguments);
+
+                this.login = new LoginRegister({
+                    appName: AGRC.appName,
+                    logoutDiv: this.logoutDiv
+                });
             },
             startup: function() {
                 // summary:

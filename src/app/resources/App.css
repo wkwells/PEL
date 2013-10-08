@@ -8,6 +8,7 @@
 @import '../../agrc/resources/locate/MagicZoom.css';
 @import '../../bootstrap/css/bootstrap.css';
 @import '../../app/resources/ReportGeneratorWizard.css';
+@import '../../ijit/widgets/resources/LoginRegister.css';
 
 body,html,.app {
     width: 100%;
