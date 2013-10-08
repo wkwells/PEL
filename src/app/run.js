@@ -10,12 +10,22 @@
         // running in build system
         projectUrl = '';
     }
-    var config = {packagePaths: {}};
+    var config = {
+        packagePaths: {},
+        packages: [{
+            name: 'bootstrap',
+            location: projectUrl + 'bootstrap',
+            main: 'js/bootstrap'
+        },{
+            name: 'jquery',
+            location: projectUrl + 'jquery',
+            main: 'jquery'
+        }]
+    };
     config.packagePaths[projectUrl] = [
         'app',
         'agrc',
-        'ijit',
-        'bootstrap'
+        'ijit'
     ];
     require(config, ['app']);
 })();
