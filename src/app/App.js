@@ -9,7 +9,7 @@ define([
         'dojo/topic',
         'dojo/aspect',
         'dojo/dom-construct',
-        
+
         'dijit/_WidgetBase',
         'dijit/_TemplatedMixin',
         'dijit/_WidgetsInTemplateMixin',
@@ -24,7 +24,7 @@ define([
         'agrc/widgets/map/BaseMapSelector',
 
         'ijit/widgets/layout/SideBarToggler',
-        'ijit/widgets/LoginRegister',
+        'ijit/widgets/authentication/LoginRegister',
 
         'app/reportGeneratorWizard',
 
@@ -165,7 +165,7 @@ define([
 
                 topic.subscribe('app/enable-tool', lang.hitch(this, 'activateTool'));
                 topic.subscribe('app/wizard-reset', lang.hitch(this, 'removeGraphic'));
-                
+
                 this.drawingToolbar.on('draw-end', lang.hitch(this, 'publishGraphic'));
             },
             activateTool: function(tool) {
