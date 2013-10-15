@@ -30,7 +30,11 @@ module.exports = function(grunt) {
             }
         },
         watch: {
-            files: ['src/app/**/*.js'],
+            files: [
+                'src/app/**/*.js',
+                'src/index.html',
+                'src/user_admin.html'
+            ],
             tasks: ['jasmine:app:build', 'jshint'],
             options: {
                 livereload: true
