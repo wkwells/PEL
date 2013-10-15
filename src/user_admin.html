@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>PEL User Admin</title>
+
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+        <link rel="stylesheet" href="http://js.arcgis.com/3.7/js/dojo/dijit/themes/dijit.css">
+        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="ijit/resources/authentication/UserAdmin.css">
+
+        <script type="text/javascript">
+            var projectUrl = location.pathname.replace(/\/[^\/]+$/, "") + '/';
+            var dojoConfig = {
+                packages: [{
+                    name: 'ijit',
+                    location: projectUrl + 'ijit/'
+                },{
+                    name: 'jquery',
+                    location: projectUrl + 'jquery/',
+                    main: 'jquery'
+                },{
+                    name: 'bootstrap',
+                    location: projectUrl + 'bootstrap/',
+                    main: 'js/bootstrap'
+                }]
+            };
+        </script>
+        <script type="text/javascript" src="http://js.arcgis.com/3.7"></script>
+
+        <script type="text/javascript">
+            require([
+                    'ijit/widgets/authentication/UserAdmin'
+                ],
+
+                function(
+                    UserAdmin
+                ) {
+                    var userAdmin = new UserAdmin({
+                        title: 'PEL',
+                        appName: 'pel'
+                    }, 'widget-div');
+                }); 
+        </script>
+    </head>
+    <body>
+        <div id="widget-div"></div>
+    </body>
+</html>
