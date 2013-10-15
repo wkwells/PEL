@@ -260,7 +260,7 @@ define([
 
                 domClass.replace(this.geometryStatus, 'glyphicon ' + cssState);
             },
-            validateGeometryPane: function(cb) {
+            validateGeometryPane: function() {
                 // summary:
                 //      validates the unique geometry view
                 console.log(this.declaredClass + '::validateGeometryPane', arguments);
@@ -484,7 +484,7 @@ define([
                     'Input_Fields': 0
                 };
 
-                if(graphic.geometry.type === 'polyline') {
+                if (graphic.geometry.type === 'polyline') {
                     gpObject.Buffer_Distance = this.reportParams.get('buffer');
                     gpObject.Line_Source_Option = 3;
                     gpObject.Polygon_Source_Option = 0;
