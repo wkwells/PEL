@@ -6,6 +6,8 @@
 /dist/dojox/*
 /dist/dijit/*
 /dist/esri/*
+/dist/bootstrap/*
+/dist/jquery/*
 /dist/ChangeLog.html
 /dist/build-report.txt
 /dist/sftp-config.json
