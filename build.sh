@@ -79,12 +79,18 @@ perl -pe "
   s/<\!--.*?-->//g;                          # Strip comments
   s/\s+/ /g;                                 # Collapse white-space" > "$DISTDIR/ChangeLog.html"
 
+echo 'copying user_admin.html'
+cat "$SRCDIR/user_admin.html" | tr '\n' ' ' | \
+perl -pe "
+  s/<\!--.*?-->//g;
+" > "$DISTDIR/user_admin.html"
+
 echo "removing un-needed dojo files"
 cd "$DISTDIR"
 # rm -rf "dojox" need to leave for gfx renderers which cannot be included in the build
 # see: http://dojotoolkit.org/reference-guide/1.9/dojox/gfx.html#id53
 # rm -rf "dijit"
-find . -name *.uncompressed.js -exec rm '{}' ';'
+# find . -name *.uncompressed.js -exec rm '{}' ';'
 find . -name *.consoleStripped.js -exec rm '{}' ';'
 
 if [ -e "$BASEDIR/sftp-config.json" ]; then
