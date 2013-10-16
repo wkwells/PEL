@@ -2,7 +2,7 @@
     var projectUrl;
     if (typeof location === 'object') {
         // running in browser
-        projectUrl = location.pathname.replace(/\/[^\/]+$/, "") + '/';
+        projectUrl = location.pathname.replace(/\/[^\/]+$/, "");
 
         // running in unit tests
         projectUrl = (projectUrl === "/") ? '/src/' : projectUrl;
@@ -14,21 +14,32 @@
         packagePaths: {},
         packages: [{
             name: 'bootstrap',
-            location: projectUrl + 'bootstrap',
+            location: projectUrl + '/bootstrap',
             main: 'js/bootstrap'
         }, {
             name: 'jquery',
-            location: projectUrl + 'jquery',
+            location: projectUrl + '/jquery',
             main: 'jquery'
         }]
-        // defaultConfig: {
-        //     locale: 'en-us'
-        // }
     };
     config.packagePaths[projectUrl] = [
         'app',
         'agrc',
-        'ijit'
+        'ijit',
+        'dojo',
+        'dijit'
     ];
-    require(config, ['app']);
+    require(config, [
+            'ijit/widgets/authentication/UserAdmin',
+            'dojo/domReady!'
+        ],
+
+        function(
+            UserAdmin
+        ) {
+            new UserAdmin({
+                title: 'PEL',
+                appName: 'pel'
+            }, 'widget-div');
+        });
 })();

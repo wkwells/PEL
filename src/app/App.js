@@ -26,7 +26,7 @@ define([
         'ijit/widgets/layout/SideBarToggler',
         'ijit/widgets/authentication/LoginRegister',
 
-        'app/reportGeneratorWizard',
+        'app/ReportGeneratorWizard',
 
         //no mapping
         'dijit/layout/BorderContainer',
