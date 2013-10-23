@@ -3,3 +3,12 @@
     width: 100%;
     display: block;
 }
+.green{
+    color: #468847;
+}
+.red{
+    color: #b94a48;
+}
+.dijitContentPane{
+    overflow: hidden;
+}

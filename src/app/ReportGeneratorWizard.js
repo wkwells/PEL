@@ -98,7 +98,7 @@ define([
                 this.reportParams = new Stateful({
                     type: null,
                     geometry: null,
-                    buffer: null,
+                    buffer: 0,
                     name: null
                 });
 
@@ -256,7 +256,7 @@ define([
                 //      handles the toggling of the has geometry flag in the wizard
                 console.log(this.declaredClass + '::displayGeometryConfirmation', arguments);
 
-                var cssState = this.reportParams.get('geometry') === null ? 'glyphicon-exclamation-sign' : 'glyphicon-ok-sign';
+                var cssState = this.reportParams.get('geometry') === null ? 'glyphicon-exclamation-sign red' : 'glyphicon-ok-sign green';
 
                 domClass.replace(this.geometryStatus, 'glyphicon ' + cssState);
             },
@@ -273,7 +273,7 @@ define([
                     domClass.add(this.bufferGroup, 'has-error', 'has-success');
                 }
 
-                if (!this.reportParams.get('geometry') || !buffer) {
+                if (!this.reportParams.get('geometry') || buffer < 0) {
                     domAttr.set(this.nextButton, 'disabled', true);
 
                     return;
@@ -293,8 +293,6 @@ define([
                 console.info(this.declaredClass + '::showSubmitButton', arguments);
 
                 if (!this.valid()) {
-                    console.log('::showSubmitButton::!valid');
-
                     domClass.add(this.submitButton, 'hidden');
                     domAttr.set(this.submitButton, 'disabled', true);
 
@@ -312,8 +310,6 @@ define([
                 var pane = this.pages[this.currentPage];
 
                 if (!lang.isFunction(pane.next)) {
-                    console.log('::showNextButton::!next');
-
                     domClass.add(this.nextButton, 'hidden');
                     domAttr.set(this.nextButton, 'disabled', true);
 
@@ -429,7 +425,7 @@ define([
             transformObjectForGp: function() {
                 // summary:
                 //      transforms wizard params to be accepted by the gp service
-                // 
+                //
                 console.log(this.declaredClass + '::transformObjectForGp', arguments);
 
                 //don't hate me since i copied this from bio-hazard
