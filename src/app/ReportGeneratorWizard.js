@@ -11,6 +11,8 @@ define([
         'dojo/aspect',
         'dojo/Stateful',
         'dojo/topic',
+        'dojo/request/xhr',
+        'dojo/json',
 
         'dojo/dom-class',
         'dojo/dom-construct',
@@ -24,7 +26,10 @@ define([
 
         'esri/tasks/Geoprocessor',
         'esri/tasks/FeatureSet',
-        'esri/graphic'
+        'esri/graphic',
+        'esri/geometry/geodesicUtils',
+        'esri/units',
+        'esri/geometry/Polygon'
     ],
 
     function(
@@ -40,6 +45,8 @@ define([
         aspect,
         Stateful,
         topic,
+        xhr,
+        JSON,
 
         domClass,
         domConstruct,
@@ -53,7 +60,10 @@ define([
 
         Geoprocessor,
         FeatureSet,
-        Graphic
+        Graphic,
+        geodesicUtils,
+        Units,
+        Polygon
     ) {
         // summary:
         //      Handles retrieving and displaying the data in the popup.
@@ -86,6 +96,12 @@ define([
                 node: 'downloadButton',
                 type: 'attribute',
                 attribute: 'href'
+            },
+
+            acceptableSizeCache: {
+                geometry: null,
+                buffer: null,
+                areaAndLength: 25
             },
 
             constructor: function() {
@@ -131,6 +147,7 @@ define([
                 this.cp2.next = lang.hitch(this, 'showNextPage');
 
                 this.cp3.updateParameters = lang.hitch(this, 'updateParamsFromTextBox');
+                //this.cp3.onShow = lang.hitch(this, 'validateGeometryArea');
                 this.cp3.validate = lang.hitch(this, 'showSubmitButton');
 
                 this.sc.startup();
@@ -268,9 +285,9 @@ define([
                 var buffer = this.reportParams.get('buffer');
 
                 if (this.numbersOnly.test(buffer)) {
-                    domClass.add(this.bufferGroup, 'has-success', 'has-error');
+                    domClass.replace(this.bufferGroup, 'has-success', 'has-error');
                 } else {
-                    domClass.add(this.bufferGroup, 'has-error', 'has-success');
+                    domClass.replace(this.bufferGroup, 'has-error', 'has-success');
                 }
 
                 if (!this.reportParams.get('geometry') || buffer < 0) {
@@ -279,7 +296,77 @@ define([
                     return;
                 }
 
-                domAttr.remove(this.nextButton, 'disabled');
+                this.validateGeometryArea();
+            },
+            validateGeometryArea: function() {
+                // summary:
+                //      description
+                console.log(this.declaredClass + '::validateGeometryArea', arguments);
+
+                //get geometry and buffer from stateful
+                var geometry = this.reportParams.get('geometry');
+                var buffer = this.reportParams.get('buffer');
+
+                //cache values so not to check if values haven't changed.
+                if (geometry === this.acceptableSizeCache.geometry && buffer === this.acceptableSizeCache.buffer) {
+                    return;
+                }
+
+                this.acceptableSizeCache.geometry = geometry;
+                this.acceptableSizeCache.buffer = buffer;
+
+                var cleanGeom = this.acceptableSizeCache.geometry.toJson();
+                delete cleanGeom.spatialReference;
+
+                var bufferInputGeom = {
+                    geometryType: '',
+                    geometries: [cleanGeom]
+                };
+
+                if (buffer === 0) {
+                    buffer = 1;
+                }
+
+                switch (this.acceptableSizeCache.geometry.type) {
+                    case 'polygon':
+                        bufferInputGeom.geometryType = 'esriGeometryPolygon';
+                        break;
+                    case 'polyline':
+                        bufferInputGeom.geometryType = 'esriGeometryPolyline';
+                        break;
+                }
+
+                //send request to buffer service which can reproject to 4326
+                return xhr('/arcgis/rest/services/Geometry/GeometryServer/buffer', {
+                    handleAs: 'json',
+                    query: {
+                        geometries: [JSON.stringify(bufferInputGeom)],
+                        inSR: 26912,
+                        outSR: 4326,
+                        distances: buffer,
+                        unit: 9002,
+                        unionResults: false,
+                        geodesic: true,
+                        f: 'json'
+                    }
+                }).then(lang.hitch(this,
+                    function(data) {
+                        var polygon = new Polygon(data.geometries[0]);
+                        var areas = geodesicUtils.geodesicAreas([polygon], Units.SQUARE_MILES);
+
+                        var cssState = areas >= this.acceptableSizeCache.areaAndLength ? 'glyphicon-exclamation-sign red' : 'glyphicon-ok-sign green';
+
+                        domClass.replace(this.geometrySize, 'glyphicon ' + cssState);
+
+                        if (areas >= this.acceptableSizeCache.areaAndLength) {
+                            this.geometryText.innerHTML = 'Polygon is too large. ' + Math.round(areas * 100) / 100 + ' sqare miles. Try to get below 25 sq/m.';
+                            return;
+                        } else {
+                            this.geometryText.innerHTML = '';
+                        }
+
+                        domAttr.remove(this.nextButton, 'disabled');
+                    }));
             },
             setupWizardPane: function() {
                 // summary:
