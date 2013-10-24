@@ -1,14 +1,15 @@
 @import '../../dijit/themes/claro/claro.css';
 @import '../../esri/css/esri.css';
+/*@import '../../bootstrap/css/bootstrap.css';*/
 @import '../../agrc/resources/map/BaseMap.css';
-@import '../../ijit/themes/standard/layout/SideBarToggler.css';
-@import '../../ijit/themes/standard/layout/PaneStack.css';
 @import '../../agrc/resources/map/BaseMapSelector.css';
 @import '../../agrc/resources/locate/FindAddress.css';
 @import '../../agrc/resources/locate/MagicZoom.css';
-/*@import '../../bootstrap/css/bootstrap.css';*/
-@import '../../app/resources/ReportGeneratorWizard.css';
+@import '../../ijit/themes/standard/layout/SideBarToggler.css';
+@import '../../ijit/themes/standard/layout/PaneStack.css';
 @import '../../ijit/resources/authentication/LoginRegister.css';
+@import '../../app/resources/ReportGeneratorWizard.css';
+@import '../../app/resources/GeometryFromRoute.css';
 
 body,html,.app {
     width: 100%;

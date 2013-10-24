@@ -27,6 +27,7 @@ define([
         'ijit/widgets/authentication/LoginRegister',
 
         'app/ReportGeneratorWizard',
+        'app/GeometryFromRoute',
 
         //no mapping
         'dijit/layout/BorderContainer',
@@ -61,7 +62,8 @@ define([
         SideBarToggler,
         LoginRegister,
 
-        Wizard
+        Wizard,
+        GeometryFromRoute
     ) {
         return declare('app/App', [_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
             // summary:
@@ -90,7 +92,7 @@ define([
             },
             postCreate: function() {
                 // summary:
-                //      Fires when 
+                //      Fires when widget has been build
                 console.log(this.declaredClass + '::' + arguments.callee.nom, arguments);
 
                 // set version number
@@ -108,7 +110,7 @@ define([
                 //      Fires after postCreate when all of the child widgets are finished laying out.
                 console.log(this.declaredClass + '::' + arguments.callee.nom, arguments);
 
-                // call this before creating the map to make sure that the map container is 
+                // call this before creating the map to make sure that the map container is
                 // the correct size
                 this.inherited(arguments);
 
@@ -153,6 +155,10 @@ define([
 
                 wizard = new Wizard({}, this.reportNode);
 
+                this.routeMilepost = new GeometryFromRoute({
+                    url: AGRC.urls.routeMilepost
+                });
+
                 this.setupConnections();
 
                 this.inherited(arguments);
@@ -160,11 +166,12 @@ define([
             setupConnections: function() {
                 // summary:
                 //      sets up the topics and ons and aspects
-                // 
+                //
                 console.log(this.declaredClass + '::setupConnections', arguments);
 
                 topic.subscribe('app/enable-tool', lang.hitch(this, 'activateTool'));
                 topic.subscribe('app/wizard-reset', lang.hitch(this, 'removeGraphic'));
+                topic.subscribe('app/publish-graphic', lang.hitch(this, 'publishGraphic'));
 
                 this.drawingToolbar.on('draw-end', lang.hitch(this, 'publishGraphic'));
             },
@@ -180,7 +187,7 @@ define([
 
                 switch (tool) {
                     case 'route-mile-post':
-                        //TODO:nmake route milepost widget do something
+                        this.routeMilepost.show();
                         break;
                     case 'line':
                         this.drawingToolbar.activate(Draw.POLYLINE);
@@ -207,6 +214,7 @@ define([
 
                 this.activeGraphic = new Graphic(evt.geometry, this.graphicSymbol);
 
+                this.map.setExtent(this.activeGraphic.geometry.getExtent(), true);
                 this.map.graphics.add(this.activeGraphic);
 
                 topic.publish('app/report-wizard-geometry', this.activeGraphic.geometry);
