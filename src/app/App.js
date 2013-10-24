@@ -100,10 +100,10 @@ define([
 
                 this.inherited(arguments);
 
-                // this.login = new LoginRegister({
-                //     appName: AGRC.appName,
-                //     logoutDiv: this.logoutDiv
-                // });
+                this.login = new LoginRegister({
+                    appName: AGRC.appName,
+                    logoutDiv: this.logoutDiv
+                });
             },
             startup: function() {
                 // summary:
