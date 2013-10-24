@@ -1,12 +1,10 @@
 define([
-    'dojo/parser', 
+    'dojo/parser',
 
     'app/App'
-], 
-
-function (
+], function(
     parser
-    ) {
+) {
     window.AGRC = {
         // errorLogger: ijit.modules.ErrorLogger
         errorLogger: null,
@@ -27,10 +25,7 @@ function (
         // apiKey: String
         //      The api key used for services on api.mapserv.utah.gov
         // apiKey: 'AGRC-63E1FF17767822', // localhost
-
-        // exportWebMapUrl: String
-        //      print task url
-        exportWebMapUrl: 'http://mapserv.utah.gov/arcgis/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task',
+        apiKey: 'AGRC-AC122FA9671436', // test.mapserv.utah.gov
 
         urls: {
             vector: 'http://mapserv.utah.gov/arcgis/rest/services/BaseMaps/Vector/MapServer',
