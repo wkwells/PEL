@@ -27,10 +27,15 @@ define([
         // apiKey: 'AGRC-63E1FF17767822', // localhost
         apiKey: 'AGRC-AC122FA9671436', // test.mapserv.utah.gov
 
+        // extentMaxArea: number
+        //      the maximum area of an extent that a report is allowed to be 
+        extentMaxArea: 1210000000,
+
         urls: {
             vector: 'http://mapserv.utah.gov/arcgis/rest/services/BaseMaps/Vector/MapServer',
             mainReport: '/arcgis/rest/services/PEL/Toolbox/GPServer/PEL_Main',
-            catexReport: '/arcgis/rest/services/PEL/Toolbox/GPServer/PEL_CatEx'
+            catexReport: '/arcgis/rest/services/PEL/Toolbox/GPServer/PEL_CatEx',
+            routeMilepost: '/arcgis/rest/services/PEL/MilepostSegment/GPServer/Milepost_Segment'
         }
     };
 

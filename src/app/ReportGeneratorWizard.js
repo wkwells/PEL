@@ -98,7 +98,7 @@ define([
                 this.reportParams = new Stateful({
                     type: null,
                     geometry: null,
-                    buffer: null,
+                    buffer: 0,
                     name: null
                 });
 
@@ -256,7 +256,7 @@ define([
                 //      handles the toggling of the has geometry flag in the wizard
                 console.log(this.declaredClass + '::displayGeometryConfirmation', arguments);
 
-                var cssState = this.reportParams.get('geometry') === null ? 'glyphicon-exclamation-sign' : 'glyphicon-ok-sign';
+                var cssState = this.reportParams.get('geometry') === null ? 'glyphicon-exclamation-sign red' : 'glyphicon-ok-sign green';
 
                 domClass.replace(this.geometryStatus, 'glyphicon ' + cssState);
             },
@@ -265,7 +265,8 @@ define([
                 //      validates the unique geometry view
                 console.log(this.declaredClass + '::validateGeometryPane', arguments);
 
-                var buffer = this.reportParams.get('buffer');
+                var buffer = this.reportParams.get('buffer'),
+                    geometry = this.reportParams.get('geometry');
 
                 if (this.numbersOnly.test(buffer)) {
                     domClass.add(this.bufferGroup, 'has-success', 'has-error');
@@ -273,11 +274,29 @@ define([
                     domClass.add(this.bufferGroup, 'has-error', 'has-success');
                 }
 
-                if (!this.reportParams.get('geometry') || !buffer) {
+
+                if (!geometry || buffer < 0) {
                     domAttr.set(this.nextButton, 'disabled', true);
 
                     return;
                 }
+
+                var area = this.getAreaOfExtent(geometry.getExtent()),
+                    acceptableArea = area <= AGRC.extentMaxArea;
+
+                //update ui
+                var css = acceptableArea ? 'glyphicon-ok-sign green' : 'glyphicon-exclamation-sign red';
+
+                domClass.replace(this.geometrySize, 'glyphicon ' + css);
+
+                if (!acceptableArea) {
+                    var percentOver = ((area - AGRC.extentMaxArea) / area) * 100;
+                    this.geometryText.innerHTML = 'Shape is too large. Reduce your shape by ' + Math.round(percentOver * 100) / 100 + '%.';
+
+                    return;
+                }
+
+                this.geometryText.innerHTML = '';
 
                 domAttr.remove(this.nextButton, 'disabled');
             },
@@ -293,8 +312,6 @@ define([
                 console.info(this.declaredClass + '::showSubmitButton', arguments);
 
                 if (!this.valid()) {
-                    console.log('::showSubmitButton::!valid');
-
                     domClass.add(this.submitButton, 'hidden');
                     domAttr.set(this.submitButton, 'disabled', true);
 
@@ -312,8 +329,6 @@ define([
                 var pane = this.pages[this.currentPage];
 
                 if (!lang.isFunction(pane.next)) {
-                    console.log('::showNextButton::!next');
-
                     domClass.add(this.nextButton, 'hidden');
                     domAttr.set(this.nextButton, 'disabled', true);
 
@@ -321,6 +336,29 @@ define([
                 }
 
                 domClass.remove(this.nextButton, 'hidden');
+            },
+            getAreaOfExtent: function(extent, buffer) {
+                // summary:
+                //      gets the area of an esri.geometry.Extent
+                // extent: esri/geometry/Extent
+                //      the extent to get the area from
+                // buffer: number
+                //      the number of feet to buffer by
+                console.log(this.declaredClass + '::getAreaOfExtent', arguments);
+
+                var length = extent.xmax - extent.xmin,
+                    width = extent.ymax - extent.ymin,
+                    meterBuffer = 0;
+
+                //coordinates are in meters, convert buffer to meters
+                if (buffer > 0) {
+                    meterBuffer = 0.3048 * buffer;
+                }
+
+                length = length + meterBuffer;
+                width = width + meterBuffer;
+
+                return length * width;
             },
             validate: function(evt) {
                 console.info(this.declaredClass + '::validate', arguments);
@@ -429,7 +467,7 @@ define([
             transformObjectForGp: function() {
                 // summary:
                 //      transforms wizard params to be accepted by the gp service
-                // 
+                //
                 console.log(this.declaredClass + '::transformObjectForGp', arguments);
 
                 //don't hate me since i copied this from bio-hazard
