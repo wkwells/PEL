@@ -32,6 +32,10 @@ function(
         //      print task url
         exportWebMapUrl: 'http://mapserv.utah.gov/arcgis/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task',
 
+        // extentMaxArea: number
+        //      the maximum area of an extent that a report is allowed to be 
+        extentMaxArea: 1210000000,
+
         urls: {
             vector: 'http://mapserv.utah.gov/arcgis/rest/services/BaseMaps/Vector/MapServer',
             mainReport: '/arcgis/rest/services/PEL/Toolbox/GPServer/PEL_Main',
