@@ -169,9 +169,9 @@ define([
                 //
                 console.log(this.declaredClass + '::setupConnections', arguments);
 
-                topic.subscribe('app/enable-tool', lang.hitch(this, 'activateTool'));
-                topic.subscribe('app/wizard-reset', lang.hitch(this, 'removeGraphic'));
-                topic.subscribe('app/publish-graphic', lang.hitch(this, 'publishGraphic'));
+                this.subscribe('app/enable-tool', lang.hitch(this, 'activateTool'));
+                this.subscribe('app/wizard-reset', lang.hitch(this, 'removeGraphic'));
+                this.subscribe('app/publish-graphic', lang.hitch(this, 'publishGraphic'));
 
                 this.drawingToolbar.on('draw-end', lang.hitch(this, 'publishGraphic'));
             },
