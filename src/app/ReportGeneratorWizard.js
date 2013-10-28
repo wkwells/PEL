@@ -377,6 +377,11 @@ define([
                 console.log(this.declaredClass + '::valid', arguments);
 
                 return array.every(this.validationProps, function(item) {
+                    if (item === 'buffer') {
+                        // 0 buffer creates false positive.
+                        return this.reportParams.get(item) > -1;
+                    }
+
                     return !!this.reportParams.get(item);
                 }, this);
             },
