@@ -281,7 +281,7 @@ define([
                     return;
                 }
 
-                var area = this.getAreaOfExtent(geometry.getExtent()),
+                var area = this.getAreaOfExtent(geometry.getExtent(), buffer),
                     acceptableArea = area <= AGRC.extentMaxArea;
 
                 //update ui
