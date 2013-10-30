@@ -34,6 +34,22 @@ require([
                 expect(testWidget.routeNode.childElementCount).toEqual(251);
             });
 
+            describe('requests', function() {
+                it('resets widget and displays message on fail', function() {
+                    spyOn(testWidget, 'onFail');
+
+                    testWidget.gpComplete({
+                        jobInfo: {
+                            "jobId": "j3ceabe28199c4529b635cadfde999b68",
+                            "jobStatus": "esriJobFailed",
+                            "messages": ['something went wrong']
+                        }
+                    });
+
+                    expect(testWidget.onFail).toHaveBeenCalled();
+                });
+            });
+
             describe('validate', function() {
                 beforeEach(function() {
                     testWidget.routeNode.value = '0080P';
@@ -42,7 +58,7 @@ require([
                 it('is true when start milepost is before end milepost', function() {
                     testWidget.startNode.value = '5';
                     testWidget.endNode.value = '11';
-                    
+
                     testWidget.updateValues();
 
                     expect(testWidget.start).toBe(5);
@@ -53,7 +69,7 @@ require([
                 it('is false when start milepost is before end milepost', function() {
                     testWidget.startNode.value = '11';
                     testWidget.endNode.value = '5';
-                    
+
                     testWidget.updateValues();
 
                     expect(testWidget.end).toBe(5);
