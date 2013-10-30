@@ -148,7 +148,6 @@ define([
                     this.email = response.user.email;
                 }));
 
-
                 this.own(
                     on(this.bufferInput, 'change', lang.hitch(this, 'updateParams')),
                     on(this.bufferInput, 'keyup', lang.hitch(this, 'updateParams'))
@@ -280,7 +279,6 @@ define([
                 } else {
                     domClass.add(this.bufferGroup, 'has-error', 'has-success');
                 }
-
 
                 if (!geometry || buffer < 0) {
                     domAttr.set(this.nextButton, 'disabled', true);
