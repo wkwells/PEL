@@ -119,8 +119,8 @@ define([
             console.log(this.declaredClass + '::updateValues', arguments);
 
             this.routeName = this.routeNode.value || 0;
-            this.start = this.startNode.value || 0;
-            this.end = this.endNode.value || 0;
+            this.start = +this.startNode.value || 0;
+            this.end = +this.endNode.value || 0;
 
             this.validate();
         },
