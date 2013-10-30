@@ -76,6 +76,9 @@ define([
             //properties to validate in order to show submit button
             validationProps: ['type', 'geometry', 'buffer', 'name'],
 
+            //the planners email
+            email: null,
+
             //esri/tasks/geoprocessing
             gp: null,
 
@@ -141,6 +144,10 @@ define([
                 console.log(this.declaredClass + '::setupConnections', arguments);
 
                 this.subscribe('app/report-wizard-geometry', lang.hitch(this, 'setGeometry'));
+                this.subscribe('LoginRegister/sign-in-success', lang.hitch(this, function(response) {
+                    this.email = response.user.email;
+                }));
+
 
                 this.own(
                     on(this.bufferInput, 'change', lang.hitch(this, 'updateParams')),
@@ -517,14 +524,15 @@ define([
                 featureVar.features = features;
 
                 var gpObject = {
-                    'Project_Name': reportName,
-                    'Project_ID': prjID,
-                    'Dynamic_Project_Drawing': featureVar,
-                    'Units_for_Buffer_Distance': units,
-                    'Buffer_Distance': 0,
-                    'Line_Source_Option': 0,
-                    'Polygon_Source_Option': 3,
-                    'Input_Fields': 0
+                    Project_Name: reportName,
+                    Project_ID: prjID,
+                    Dynamic_Project_Drawing: featureVar,
+                    Units_for_Buffer_Distance: units,
+                    Buffer_Distance: 0,
+                    Line_Source_Option: 0,
+                    Polygon_Source_Option: 3,
+                    Input_Fields: 0,
+                    Planner: this.email
                 };
 
                 if (graphic.geometry.type === 'polyline') {
@@ -646,7 +654,7 @@ define([
                 //TODO: this.reset wizard
                 console.log(this.declaredClass + '::displayLink', arguments);
 
-                this.set('downloadUrl', response.result.value);
+                this.set('downloadUrl', response.result.value.url);
                 this.downloadButton.innerHTML = 'Download Report';
 
                 domClass.remove(this.backButton, 'hidden');

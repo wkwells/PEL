@@ -53,9 +53,33 @@ import arcpy as ap
 # # Import sqlalchemy for database connection
 # import sqlalchemy
 
+import smtplib
+from email.mime.text import MIMEText
+
+report_url = "/some_report.pdf"
+
+def notify():
+    server = smtplib.SMTP('send.state.ut.us', 25)
+
+    from_addr = "noreply@utah.gov"
+    #: will need to get email address sent in with request
+
+    to_addr = [ap.GetParameterAsText(8)]
+    
+    ap.AddMessage("** {}".format(to_addr))
+
+    message = MIMEText("Your report can be found at {}".format(report_url), "plain")
+
+    message['Subject'] = "PEL Report Complete"
+    message['From'] = from_addr
+    message['To'] = ", ".join(to_addr)
+
+    message = message.as_string();
+    server.sendmail(from_addr, to_addr, message)
+    server.quit()
 
 def main():
-    ap.SetParameterAsText(8, "/fakeurl.pdf")
+    ap.SetParameterAsText(9, report_url)
 #     """Execute PEL tasks"""
 
 #     # Start of the analysis, runtime
@@ -808,3 +832,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    notify()
