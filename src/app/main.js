@@ -35,7 +35,7 @@ define([
             vector: 'http://mapserv.utah.gov/arcgis/rest/services/BaseMaps/Vector/MapServer',
             mainReport: '/arcgis/rest/services/PEL/Toolbox/GPServer/PEL_Main',
             catexReport: '/arcgis/rest/services/PEL/Toolbox/GPServer/PEL_CatEx',
-            routeMilepost: '/arcgis/rest/services/PEL/MilepostSegment/GPServer/Milepost_Segment'
+            routeMilepost: '/arcgis/rest/services/PEL/Toolbox/GPServer/Milepost_Segment'
         }
     };
 

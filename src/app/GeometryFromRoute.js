@@ -206,8 +206,19 @@ define([
                     );
                     break;
                 case 'esriJobFailed':
+                    this.onFail(status.jobInfo);
                     break;
             }
+        },
+        onFail: function(status) {
+            // summary:
+            //      description
+            // status: esri/tasks/JobInfo
+            console.log(this.declaredClass + '::onFail', arguments);
+
+            domAttr.remove(this.submitButton, 'disabled');
+            this.errorDiv.innerHTML = 'Your mile posts may be out of range. ' + status.messages;
+
         },
         displayResult: function(response) {
             // summary:
