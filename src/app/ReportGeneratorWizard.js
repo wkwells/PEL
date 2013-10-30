@@ -652,7 +652,7 @@ define([
                 //TODO: this.reset wizard
                 console.log(this.declaredClass + '::displayLink', arguments);
 
-                this.set('downloadUrl', response.result.value.url);
+                this.set('downloadUrl', response.result.value);
                 this.downloadButton.innerHTML = 'Download Report';
 
                 domClass.remove(this.backButton, 'hidden');
