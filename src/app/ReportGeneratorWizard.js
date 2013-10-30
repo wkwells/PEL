@@ -101,7 +101,7 @@ define([
                 this.reportParams = new Stateful({
                     type: null,
                     geometry: null,
-                    buffer: 0,
+                    buffer: 1,
                     name: null
                 });
 
@@ -274,13 +274,13 @@ define([
                 var buffer = this.reportParams.get('buffer'),
                     geometry = this.reportParams.get('geometry');
 
-                if (this.numbersOnly.test(buffer)) {
-                    domClass.add(this.bufferGroup, 'has-success', 'has-error');
+                if (this.numbersOnly.test(buffer) && buffer > 0) {
+                    domClass.replace(this.bufferGroup, 'has-success', 'has-error');
                 } else {
-                    domClass.add(this.bufferGroup, 'has-error', 'has-success');
+                    domClass.replace(this.bufferGroup, 'has-error', 'has-success');
                 }
 
-                if (!geometry || buffer < 0) {
+                if (!geometry || buffer < 1) {
                     domAttr.set(this.nextButton, 'disabled', true);
 
                     return;
@@ -384,7 +384,7 @@ define([
                 return array.every(this.validationProps, function(item) {
                     if (item === 'buffer') {
                         // 0 buffer creates false positive.
-                        return this.reportParams.get(item) > -1;
+                        return this.reportParams.get(item) > 0;
                     }
 
                     return !!this.reportParams.get(item);
