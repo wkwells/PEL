@@ -20,7 +20,7 @@ define([
 
         // version: String
         //      The version number.
-        version: '0.1.0',
+        version: '0.2.0',
 
         // apiKey: String
         //      The api key used for services on api.mapserv.utah.gov
@@ -35,7 +35,7 @@ define([
             vector: 'http://mapserv.utah.gov/arcgis/rest/services/BaseMaps/Vector/MapServer',
             mainReport: '/arcgis/rest/services/PEL/Toolbox/GPServer/PEL_Main',
             catexReport: '/arcgis/rest/services/PEL/Toolbox/GPServer/PEL_CatEx',
-            routeMilepost: '/arcgis/rest/services/PEL/MilepostSegment/GPServer/Milepost_Segment'
+            routeMilepost: '/arcgis/rest/services/PEL/Toolbox/GPServer/Milepost_Segment'
         }
     };
 

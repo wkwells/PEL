@@ -19,7 +19,7 @@ define([
     'esri/graphic',
     'esri/symbols/SimpleLineSymbol',
 
-    'app/resources/routes',
+    'app/data/routes',
 
     'jquery/jquery'
 ], function(
