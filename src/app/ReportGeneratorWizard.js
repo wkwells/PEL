@@ -76,6 +76,9 @@ define([
             //properties to validate in order to show submit button
             validationProps: ['type', 'geometry', 'buffer', 'name'],
 
+            //the planners email
+            email: null,
+
             //esri/tasks/geoprocessing
             gp: null,
 
@@ -98,7 +101,7 @@ define([
                 this.reportParams = new Stateful({
                     type: null,
                     geometry: null,
-                    buffer: 0,
+                    buffer: 1,
                     name: null
                 });
 
@@ -141,6 +144,9 @@ define([
                 console.log(this.declaredClass + '::setupConnections', arguments);
 
                 this.subscribe('app/report-wizard-geometry', lang.hitch(this, 'setGeometry'));
+                this.subscribe('LoginRegister/sign-in-success', lang.hitch(this, function(response) {
+                    this.email = response.user.email;
+                }));
 
                 this.own(
                     on(this.bufferInput, 'change', lang.hitch(this, 'updateParams')),
@@ -268,20 +274,19 @@ define([
                 var buffer = this.reportParams.get('buffer'),
                     geometry = this.reportParams.get('geometry');
 
-                if (this.numbersOnly.test(buffer)) {
-                    domClass.add(this.bufferGroup, 'has-success', 'has-error');
+                if (this.numbersOnly.test(buffer) && buffer > 0) {
+                    domClass.replace(this.bufferGroup, 'has-success', 'has-error');
                 } else {
-                    domClass.add(this.bufferGroup, 'has-error', 'has-success');
+                    domClass.replace(this.bufferGroup, 'has-error', 'has-success');
                 }
 
-
-                if (!geometry || buffer < 0) {
+                if (!geometry || buffer < 1) {
                     domAttr.set(this.nextButton, 'disabled', true);
 
                     return;
                 }
 
-                var area = this.getAreaOfExtent(geometry.getExtent()),
+                var area = this.getAreaOfExtent(geometry.getExtent(), buffer),
                     acceptableArea = area <= AGRC.extentMaxArea;
 
                 //update ui
@@ -377,6 +382,11 @@ define([
                 console.log(this.declaredClass + '::valid', arguments);
 
                 return array.every(this.validationProps, function(item) {
+                    if (item === 'buffer') {
+                        // 0 buffer creates false positive.
+                        return this.reportParams.get(item) > 0;
+                    }
+
                     return !!this.reportParams.get(item);
                 }, this);
             },
@@ -512,14 +522,15 @@ define([
                 featureVar.features = features;
 
                 var gpObject = {
-                    'Project_Name': reportName,
-                    'Project_ID': prjID,
-                    'Dynamic_Project_Drawing': featureVar,
-                    'Units_for_Buffer_Distance': units,
-                    'Buffer_Distance': 0,
-                    'Line_Source_Option': 0,
-                    'Polygon_Source_Option': 3,
-                    'Input_Fields': 0
+                    Project_Name: reportName,
+                    Project_ID: prjID,
+                    Dynamic_Project_Drawing: featureVar,
+                    Units_for_Buffer_Distance: units,
+                    Buffer_Distance: 0,
+                    Line_Source_Option: 0,
+                    Polygon_Source_Option: 3,
+                    Input_Fields: 0,
+                    Planner: this.email
                 };
 
                 if (graphic.geometry.type === 'polyline') {

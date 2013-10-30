@@ -52,10 +52,33 @@ import arcpy as ap
 
 # # Import sqlalchemy for database connection
 # import sqlalchemy
+import smtplib
+from email.mime.text import MIMEText
 
+report_url = "/some_report.pdf"
+
+def notify():
+    server = smtplib.SMTP('send.state.ut.us', 25)
+
+    from_addr = "noreply@utah.gov"
+    #: will need to get email address sent in with request
+
+    to_addr = [ap.GetParameterAsText(8)]
+    
+    ap.AddMessage("** {}".format(to_addr))
+
+    message = MIMEText("Your report can be found at {}".format(report_url), "plain")
+
+    message['Subject'] = "PEL Report Complete"
+    message['From'] = from_addr
+    message['To'] = ", ".join(to_addr)
+
+    message = message.as_string();
+    server.sendmail(from_addr, to_addr, message)
+    server.quit()
 
 def main():
-    ap.SetParameterAsText(8, "/fakeurl.pdf")
+    ap.SetParameterAsText(9, report_url)
 
 #     """Execute PEL tasks"""
 
@@ -174,7 +197,7 @@ def main():
 #     merged_outfolder = folders.merged_folder
 #     intermediate_outfolder = folders.intermediate_folder
 #     final_outfolder = folders.final_reports_folder
-    
+
 #     # Final PDF report written here for user consumption
 #     server_outfolder = pel_info.Locations.web_outfolder + "\\" + date_piece
 
@@ -809,3 +832,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    notify()

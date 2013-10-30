@@ -119,8 +119,8 @@ define([
             console.log(this.declaredClass + '::updateValues', arguments);
 
             this.routeName = this.routeNode.value || 0;
-            this.start = this.startNode.value || 0;
-            this.end = this.endNode.value || 0;
+            this.start = +this.startNode.value || 0;
+            this.end = +this.endNode.value || 0;
 
             this.validate();
         },
@@ -172,6 +172,7 @@ define([
             console.log(this.declaredClass + '::submitJob', arguments);
 
             domAttr.set(this.submitButton, 'disabled', true);
+            this.errorDiv.innerHTML = '';
 
             var gpObject = {
                 'Route_ID': this.routeName,
@@ -206,8 +207,18 @@ define([
                     );
                     break;
                 case 'esriJobFailed':
+                    this.onFail();
                     break;
             }
+        },
+        onFail: function() {
+            // summary:
+            //      description
+            console.log(this.declaredClass + '::onFail', arguments);
+
+            domAttr.remove(this.submitButton, 'disabled');
+            this.errorDiv.innerHTML = 'Your mile posts may be out of range for the route. ';
+
         },
         displayResult: function(response) {
             // summary:
