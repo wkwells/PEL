@@ -18,7 +18,8 @@ module.exports = function(grunt) {
                     specs: ['src/app/tests/spec/*.js'],
                     vendor: [
                         'src/app/tests/jasmineTestBootstrap.js',
-                        'http://js.arcgis.com/3.6/'
+                        // 'http://js.arcgis.com/3.6/',
+                        'src/dojo/dojo.js'
                     ]
                 }
             }
@@ -32,6 +33,7 @@ module.exports = function(grunt) {
         watch: {
             files: [
                 'src/app/**/*.js',
+                'src/app/tests/*.html',
                 'src/index.html',
                 'src/user_admin.html'
             ],

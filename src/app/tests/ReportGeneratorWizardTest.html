@@ -3,8 +3,8 @@
 <head>
     <title>TEST: ReportGeneratorWizard</title>
     
-    <link rel='stylesheet' href='http://js.arcgis.com/3.6/js/dojo/dijit/themes/claro/claro.css'>
-    <link rel="stylesheet" type="text/css" href="http://js.arcgis.com/3.6/js/esri/css/esri.css" />
+    <!-- <link rel='stylesheet' href='http://js.arcgis.com/3.7/js/dojo/dijit/themes/claro/claro.css'>
+    <link rel="stylesheet" type="text/css" href="http://js.arcgis.com/3.7/js/esri/css/esri.css" /> -->
     <link href="../../bootstrap/css/bootstrap.css" rel="stylesheet">
     <link rel='stylesheet' href='../../app/resources/app.css'>
     <link rel="stylesheet" href='../../app/resources/ReportGeneratorWizard.css'>
@@ -12,63 +12,121 @@
     .report-wizard{
         width: 400px;
         border: 1px black solid;
-        }
-        </style>
-        <!-- JAVASCRIPT -->
-        <script src='http://js.arcgis.com/3.6'></script>
-        <script type="text/javascript">
-        var projectUrl = location.pathname.replace(/\/[^\/]+$/, "") + '/';
-        var widgetUnderTest;
+    }
+    body,html,.app {
+    overflow: auto;
+}
+    </style>
+    <!-- JAVASCRIPT -->
+    <!--<script src='http://js.arcgis.com/3.7'></script>-->
+    <script src='../../dojo/dojo.js'></script>
+    <script type="text/javascript">
+    var projectUrl = location.pathname.replace(/\/[^\/]+$/, "") + '/';
+    var widgetUnderTest;
 
-        require({
-                packages: [{
-                    name: 'app',
-                    location: projectUrl + '../../app'
-                }, {
-                    name: 'agrc',
-                    location: projectUrl + '../../agrc'
-                }]
-            }, [
-                'app/ReportGeneratorWizard',
+    require({
+        packages: [{
+            name: 'app',
+            location: projectUrl + '../../app'
+        }, {
+            name: 'agrc',
+            location: projectUrl + '../../agrc'
+        }, {
+            name: 'esri',
+            location: projectUrl + '../../esri'
+        }]
+    }, [
+        'app/ReportGeneratorWizard',
+        'app/_ReportTypeWizardPane',
+        'app/_ReportGeometryWizardPane',
+        'app/_ReportNameWizardPane',
+        'app/_ReportWizardControlPanel',
 
-                'dojo/dom',
-                'dojo/topic',
-                'dojo/on',
+        'dojo/dom',
+        'dojo/topic',
+        'dojo/on',
 
-                'dojo/domReady!'
-            ],
-            function(Module, dom, topic, on) {
-                widgetUnderTest = new Module({}, contentNode);
+        'esri/geometry/Polyline',
 
-                topic.subscribe('app/enable-tool', function(tool) {
-                    dom.byId('publish').innerHTML = tool;
-                });
+        'dojo/domReady!'
+    ], function(
+        Module,
+        Pane1,
+        Pane2,
+        Pane3,
+        Controls,
 
-                on(dom.byId("btn"), "click", function() {
-                    topic.publish('app/report-wizard-geometry', {
-                        geom: [1, 2, 3]
-                    });
-                });
+        dom,
+        topic,
+        on,
 
-                window.AGRC = {
-                    urls: {
-                        vector: 'http://mapserv.utah.gov/arcgis/rest/services/BaseMaps/Vector/MapServer',
-                        mainReport: '/arcgis/rest/services/PEL/Toolbox/GPServer/PEL_Main',
-                        catexReport: '/arcgis/rest/services/PEL/Toolbox/GPServer/PEL_CatEx'
+        Geometry
+    ) {
+        window.AGRC = {
+            urls: {
+                vector: 'http://mapserv.utah.gov/arcgis/rest/services/BaseMaps/Vector/MapServer',
+                mainReport: '/arcgis/rest/services/PEL/Toolbox/GPServer/PEL_Main',
+                catexReport: '/arcgis/rest/services/PEL/Toolbox/GPServer/PEL_CatEx',
+            uploadUrl: '/arcgis/rest/services/PEL/Toolbox/GPServer/uploads/upload'
+            },
+            extentMaxArea: 1210000000
+        };
+
+        widgetUnderTest = new Module({
+            url: AGRC.urls.mainReport,
+            resultName: 'url'
+        }, 'contentNode');
+
+        topic.subscribe('app/enable-tool', function(tool) {
+            dom.byId('publish').innerHTML = tool;
+        });
+
+        var polyline = new Geometry({
+                "type": "polyline",
+                "paths": [
+                    [
+                        [242994.6799999997, 4514126.4399999995],
+                        [243094, 4514138.92],
+                        [250591.7999999998, 4514172.51],
+                        [250748.59999999963, 4514156.51],
+                        [250811.23000000045, 4514150.75]
+                    ]
+                ],
+                "_path": 0,
+                "spatialReference": {
+                    "wkid": 26912,
+                    "latestWkid": 26912
+                },
+                "_extent": {
+                    "xmin": 242994.6799999997,
+                    "ymin": 4514126.4399999995,
+                    "xmax": 250811.23000000045,
+                    "ymax": 4515030.01,
+                    "spatialReference": {
+                        "wkid": 26912,
+                        "latestWkid": 26912
                     }
-                };
+                }
             });
-        </script>
-    </head>
-    <body>
-        <h3>
-            app/ReportGeneratorWizard
-        </h3>
-        <div id="contentNode">
-        </div>
 
+        on(dom.byId("btn"), "click", function() {
+            topic.publish('app/report-wizard-geometry', polyline);
+        });
+    });
+</script>
+</head>
+<body>
+    <h3>
+        app/ReportGeneratorWizard
+    </h3>
+    <div id="contentNode"></div>
     <label id="publish"></label>
     <input type="button" id="btn" value="geometry set"></button>
+    <div id="pane1"></div>
+    <div id="pane2"></div>
+    <div id="pane3"></div>
+    <div id="controls"></div>
+
     <script src="../../jquery/jquery.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="../../bootstrap/js/bootstrap.js"></script>

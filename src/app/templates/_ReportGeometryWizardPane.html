@@ -1,0 +1,43 @@
+<div data-dojo-type='dijit/layout/ContentPane' data-dojo-attach-point='pane' class='wizard-container'>
+  <div class='form-group'>
+    <label>Define your area of interest?</label>
+    <div class='btn-group'>
+      <button type='button' data-dojo-attach-event='click: toolChoice' data-prop='tool' data-tool='route-mile-post' class='btn btn-default btn-sm'>Route and milepost</button>
+      <button type='button' data-dojo-attach-event='click: toolChoice' data-prop='tool' data-tool='shapefile' class='btn btn-default btn-sm'>Shapefile</button>
+    </div>
+    <div class='btn-group'>
+      <button type='button' data-dojo-attach-event='click: toolChoice' data-prop='tool' data-tool='line' class='btn btn-default btn-sm'>Along a line</button>
+      <button type='button' data-dojo-attach-event='click: toolChoice' data-prop='tool' data-tool='polygon' class='btn btn-default btn-sm'>Within a polygon</button>
+    </div>
+  </div>
+  <div class='form-group' data-dojo-attach-point='shapefileGroup'>
+    <label for='exampleInputFile'>Shapefile Bundle: </label>
+    <form data-dojo-attach-point="uploadForm" method="post" enctype="multipart/form-data">
+      <div class="input-group">
+        <input type="file" data-dojo-attach-point='shapefile' class='form-control' name="file" />
+        <span class="input-group-btn">
+          <button class="btn btn-default" type="button" data-dojo-attach-event='click: uploadFile'>Upload</button>
+        </span>
+      </div>
+    </form>
+    <div class='form-group'>
+      <label class='control-label'>Has File: <span class='glyphicon glyphicon-exclamation-sign' data-dojo-attach-point='fileStatus'></span></label>
+    </div>
+    <p class='help-block'>Zip file containing shapefile parts.</p>
+  </div>
+  <div data-dojo-attach-point='drawingGroup'>
+    <div class='form-group'>
+      <label class='control-label'>Has Geometry: <span class='glyphicon glyphicon-exclamation-sign' data-dojo-attach-point='geometryStatus'></span></label>
+    </div>
+    <div class='form-group'>
+      <label class='control-label'>Geometry Size: <span class='glyphicon glyphicon-exclamation-sign' data-dojo-attach-point='geometrySize'></span></label> <span data-dojo-attach-point='geometryText'></span>
+    </div>
+  </div>
+  <div class='form-group' data-dojo-attach-point='bufferGroup'>
+    <label class='control-label'>Geometry Buffer</label>
+    <div class='input-group'>
+      <input type='number' class='form-control' data-prop='buffer' data-dojo-attach-point='bufferInput' placeholder='1' value='1'/>
+      <span class='input-group-addon'>feet</span>
+    </div>
+  </div>
+</div>

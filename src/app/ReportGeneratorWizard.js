@@ -1,670 +1,245 @@
 define([
-        'dojo/_base/declare',
-        'dojo/_base/lang',
-        'dojo/_base/array',
-        'dojo/_base/event',
+    'dojo/text!app/templates/ReportGeneratorWizard.html',
 
-        'dojo/text!app/templates/ReportGeneratorWizard.html',
+    'dojo/_base/declare',
+    'dojo/_base/lang',
+    'dojo/_base/array',
 
-        'dojo/dom',
-        'dojo/on',
-        'dojo/aspect',
-        'dojo/Stateful',
-        'dojo/topic',
+    'dojo/request/iframe',
 
-        'dojo/dom-class',
-        'dojo/dom-construct',
-        'dojo/dom-attr',
+    'dijit/_WidgetBase',
+    'dijit/_TemplatedMixin',
+    'dijit/_WidgetsInTemplateMixin',
 
-        'dijit/_WidgetBase',
-        'dijit/_TemplatedMixin',
-        'dijit/layout/StackContainer',
-        'dijit/layout/ContentPane',
-        'dijit/_WidgetsInTemplateMixin',
+    'app/_ReportWizardControlPanel',
+    'app/_ReportTypeWizardPane',
+    'app/_ReportGeometryWizardPane',
+    'app/_ReportNameWizardPane',
+    'app/_ReportWizardAsyncGeoprocessing',
 
-        'esri/tasks/Geoprocessor',
-        'esri/tasks/FeatureSet',
-        'esri/graphic'
-    ],
+    'esri/tasks/FeatureSet',
+    'esri/graphic',
 
-    function(
-        declare,
-        lang,
-        array,
-        events,
+    'dijit/layout/StackContainer'
+], function(
+    template,
 
-        template,
+    declare,
+    lang,
+    array,
 
-        dom,
-        on,
-        aspect,
-        Stateful,
-        topic,
+    iframe,
 
-        domClass,
-        domConstruct,
-        domAttr,
+    _WidgetBase,
+    _TemplatedMixin,
+    _WidgetsInTemplateMixin,
 
-        _WidgetBase,
-        _TemplatedMixin,
-        StackContainer,
-        ContentPane,
-        _WidgetsInTemplateMixin,
+    ControlPanel,
+    TypePane,
+    GeometryPane,
+    NamePane,
+    AsyncGp,
 
-        Geoprocessor,
-        FeatureSet,
-        Graphic
-    ) {
-        // summary:
-        //      Handles retrieving and displaying the data in the popup.
-        return declare('app.ReportGeneratorWizard', [_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
-            baseClass: 'report-wizard',
+    FeatureSet,
+    Graphic
+) {
+    // summary:
+    //      Handles retrieving and displaying the data in the popup.
+    return declare('app.ReportGeneratorWizard', [_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, AsyncGp], {
+        baseClass: 'report-wizard',
 
-            widgetsInTemplate: true,
+        widgetsInTemplate: true,
 
-            templateString: template,
+        templateString: template,
 
-            // the template page that is visible
-            currentPage: 0,
+        //the planners email
+        email: null,
 
-            //regex
-            numbersOnly: null,
+        constructor: function() {
+            // summary:
+            //      constructor
+            console.log(this.declaredClass + '::constructor', arguments);
 
-            //dojo stateful
-            reportParams: null,
+            this.inherited(arguments);
+        },
+        postCreate: function() {
+            // summary:
+            //      dom is ready
+            console.info(this.declaredClass + '::postCreate', arguments);
 
-            //properties to validate in order to show submit button
-            validationProps: ['type', 'geometry', 'buffer', 'name'],
+            this.inherited(arguments);
 
-            //the planners email
-            email: null,
+            this.setupWizard();
 
-            //esri/tasks/geoprocessing
-            gp: null,
+            this.setupConnections();
+        },
+        setupWizard: function() {
+            // summary:
+            //      sets up the wizard pane functionality
+            console.log(this.declaredClass + '::setupWizard', arguments);
 
-            //async gp task job id
-            jobId: null,
+            var reportTypePane = new TypePane({
+                parentWidget: this
+            }, this.cp1),
 
-            _setDownloadUrlAttr: {
-                node: 'downloadButton',
-                type: 'attribute',
-                attribute: 'href'
-            },
+                geometryPane = new GeometryPane({
+                    parentWidget: this
+                }, this.cp2),
 
-            constructor: function() {
-                // summary:
-                //      constructor
-                console.log(this.declaredClass + '::constructor', arguments);
+                reportTitlePane = new NamePane({
+                    parentWidget: this
+                }, this.cp3),
 
-                this.inherited(arguments);
+                controls = new ControlPanel({
+                    parentWidget: this,
+                    panes: [reportTypePane, geometryPane, reportTitlePane]
+                }, this.controlPanelNode);
 
-                this.reportParams = new Stateful({
-                    type: null,
-                    geometry: null,
-                    buffer: 1,
-                    name: null
-                });
+            this.panes = [reportTypePane, geometryPane, reportTitlePane];
 
-                this.numbersOnly = new RegExp('^[0-9.]+$');
-            },
-            postCreate: function() {
-                // summary:
-                //      dom is ready
-                console.info(this.declaredClass + '::postCreate', arguments);
+            controls.startup();
+            this.sc.startup();
+        },
+        setupConnections: function() {
+            // summary:
+            //      sets up the connections obviously
+            console.log(this.declaredClass + '::setupConnections', arguments);
 
-                this.inherited(arguments);
+            this.subscribe('LoginRegister/sign-in-success', lang.hitch(this, function(response) {
+                this.email = response.user.email;
+            }));
+        },
+        isValid: function() {
+            console.info(this.declaredClass + '::isValid', arguments);
 
-                this.setupWizard();
+            // validate all the panes
+            return array.every(this.panes, function(pane) {
+                return pane.validate();
+            }, this);
+        },
+        submit: function() {
+            // summary:
+            //      handles the submitting of the wizard
+            // evt: the mouse click or submission event
+            console.log(this.declaredClass + '::submit', arguments);
 
-                this.setupConnections();
-            },
-            setupWizard: function() {
-                // summary:
-                //      sets up the wizard pane functionality
-                console.log(this.declaredClass + '::setupWizard', arguments);
+            if (!this.isValid()) {
+                return false;
+            }
 
-                this.pages = [this.cp1, this.cp2, this.cp3];
+            var data = this.collectData();
 
-                this.cp1.updateParameters = lang.hitch(this, 'updateParamsFromButton');
-                this.cp1.validate = lang.hitch(this, 'initReportType');
+            this.initReportType(data);
 
-                this.cp2.updateParameters = lang.hitch(this, 'updateParamsFromTextBox');
-                this.cp2.validate = lang.hitch(this, 'validateGeometryPane');
-                this.cp2.onShow = lang.hitch(this, 'validateGeometryPane');
-                this.cp2.next = lang.hitch(this, 'showNextPage');
+            var gpData = this.transformData(data);
 
-                this.cp3.updateParameters = lang.hitch(this, 'updateParamsFromTextBox');
-                this.cp3.validate = lang.hitch(this, 'showSubmitButton');
+            this.submitJob(gpData);
 
-                this.sc.startup();
-            },
-            setupConnections: function() {
-                // summary:
-                //      sets up the connections obviously
-                console.log(this.declaredClass + '::setupConnections', arguments);
+            return true;
+        },
+        collectData: function() {
+            // summary:
+            //      collects the data parts from the various panes
+            //
+            console.log(this.declaredClass + '::collectData', arguments);
+            var data = {};
 
-                this.subscribe('app/report-wizard-geometry', lang.hitch(this, 'setGeometry'));
-                this.subscribe('LoginRegister/sign-in-success', lang.hitch(this, function(response) {
-                    this.email = response.user.email;
-                }));
-
-                this.own(
-                    on(this.bufferInput, 'change', lang.hitch(this, 'updateParams')),
-                    on(this.bufferInput, 'keyup', lang.hitch(this, 'updateParams'))
-                );
-
-                aspect.after(this, 'showNextPage', lang.hitch(this, 'setupWizardPane'));
-                aspect.after(this, 'setGeometry', lang.hitch(this, 'displayGeometryConfirmation'));
-                aspect.after(this, 'setGeometry', lang.hitch(this, 'validateGeometryPane'));
-            },
-            showNextPage: function(direction) {
-                // summary:
-                //      shows the next wizard panel
-                // direction: string: forward or backward. default and null is forward.
-                console.info(this.declaredClass + '::showNextPage', arguments);
-
-                if (direction && direction == 'back') {
-                    if (this.currentPage > 0) {
-                        this.currentPage--;
+            array.forEach(this.panes, function(pane) {
+                for (var x in pane.reportParams) {
+                    if (pane.reportParams.hasOwnProperty(x) &&
+                        x != '_watchCallbacks' && !lang.isFunction(pane.reportParams[x])) {
+                        data[x] = pane.reportParams.get(x);
                     }
-
-                    if (this.currentPage === 0) {
-                        domClass.add(this.controlPanel, 'hidden');
-                    }
-                } else {
-                    if (this.currentPage < 0) {
-                        domClass.add(this.controlPanel, 'hidden');
-
-                        this.currentPage = 0;
-
-                        return;
-                    }
-
-                    if (this.currentPage < this.pages.length - 1) {
-                        this.currentPage++;
-                    }
-
-                    domClass.remove(this.controlPanel, 'hidden');
                 }
+            }, this);
 
-                var pane = this.pages[this.currentPage];
-                this.sc.selectChild(pane);
-
-                if (lang.isFunction(pane.onShow)) {
-                    pane.onShow();
-                }
+            return data;
+        },
+        transformData: function(data) {
+            // summary:
+            //      modifies the data for the gp service
+            // data: object
+            //      the data collected from the wizard panes
+            console.log(this.declaredClass + '::transformData', arguments);
+            var sourceOptions = {
+                noData: 0,
+                shapefile: 1,
+                folderWithShapefiles: 2,
+                userDrawn: 3
             },
-            back: function() {
-                console.info(this.declaredClass + '::back', arguments);
-
-                this.showNextPage('back');
-            },
-            next: function() {
-                // summary:
-                //      calls the next funciton of the current page
-                console.log(this.declaredClass + '::next', arguments);
-
-                var pane = this.pages[this.currentPage];
-                pane.next();
-            },
-            updateParams: function(evt) {
-                // summary:
-                //      generic method called from the widget pane form elements
-                // evt: the form element event. Could be click, change, keyDown, etc
-                console.log(this.declaredClass + '::updateParams', arguments);
-
-                var currentPage = this.pages[this.currentPage];
-                if (lang.isFunction(currentPage.updateParameters)) {
-                    currentPage.updateParameters(evt);
-                }
-                if (lang.isFunction(currentPage.validate)) {
-                    currentPage.validate(evt);
-                }
-
-                this.showSubmitButton();
-            },
-            updateParamsFromButton: function(evt) {
-                console.info(this.declaredClass + '::updateParamsFromButton', arguments);
-
-                var node = evt.target,
-                    prop = node.getAttribute('data-prop'),
-                    value = null;
-
-                value = node.getAttribute('data-' + prop);
-
-                this.reportParams.set(prop, value.toLowerCase());
-            },
-            updateParamsFromTextBox: function(evt) {
-                // summary:
-                //      gets the value from a textbox
-                // evt: onchange event on a input type='text'
-                console.log(this.declaredClass + '::updateParamsFromTextBox', arguments);
-
-                var node = evt.target,
-                    prop = node.getAttribute('data-prop'),
-                    value = null;
-
-                value = node.value.toLowerCase();
-
-                this.reportParams.set(prop, value.toLowerCase());
-            },
-            setGeometry: function(geom) {
-                // summary:
-                //      topic subscription to geometry drawing
-                // geom: the geometry of the shape to use for the report
-                console.log(this.declaredClass + '::setGeometry', arguments);
-
-                // set the geometry
-                this.reportParams.set('geometry', geom);
-            },
-            displayGeometryConfirmation: function() {
-                // summary:
-                //      handles the toggling of the has geometry flag in the wizard
-                console.log(this.declaredClass + '::displayGeometryConfirmation', arguments);
-
-                var cssState = this.reportParams.get('geometry') === null ? 'glyphicon-exclamation-sign red' : 'glyphicon-ok-sign green';
-
-                domClass.replace(this.geometryStatus, 'glyphicon ' + cssState);
-            },
-            validateGeometryPane: function() {
-                // summary:
-                //      validates the unique geometry view
-                console.log(this.declaredClass + '::validateGeometryPane', arguments);
-
-                var buffer = this.reportParams.get('buffer'),
-                    geometry = this.reportParams.get('geometry');
-
-                if (this.numbersOnly.test(buffer) && buffer > 0) {
-                    domClass.replace(this.bufferGroup, 'has-success', 'has-error');
-                } else {
-                    domClass.replace(this.bufferGroup, 'has-error', 'has-success');
-                }
-
-                if (!geometry || buffer < 1) {
-                    domAttr.set(this.nextButton, 'disabled', true);
-
-                    return;
-                }
-
-                var area = this.getAreaOfExtent(geometry.getExtent(), buffer),
-                    acceptableArea = area <= AGRC.extentMaxArea;
-
-                //update ui
-                var css = acceptableArea ? 'glyphicon-ok-sign green' : 'glyphicon-exclamation-sign red';
-
-                domClass.replace(this.geometrySize, 'glyphicon ' + css);
-
-                if (!acceptableArea) {
-                    var percentOver = ((area - AGRC.extentMaxArea) / area) * 100;
-                    this.geometryText.innerHTML = 'Shape is too large. Reduce your shape by ' + Math.round(percentOver * 100) / 100 + '%.';
-
-                    return;
-                }
-
-                this.geometryText.innerHTML = '';
-
-                domAttr.remove(this.nextButton, 'disabled');
-            },
-            setupWizardPane: function() {
-                // summary:
-                //      handles the state of the pane and it's buttons
-                console.log(this.declaredClass + '::setupWizardPane', arguments);
-
-                this.showSubmitButton();
-                this.showNextButton();
-            },
-            showSubmitButton: function() {
-                console.info(this.declaredClass + '::showSubmitButton', arguments);
-
-                if (!this.valid()) {
-                    domClass.add(this.submitButton, 'hidden');
-                    domAttr.set(this.submitButton, 'disabled', true);
-
-                    return;
-                }
-
-                domClass.remove(this.submitButton, 'hidden');
-                domAttr.set(this.submitButton, 'disabled', false);
-            },
-            showNextButton: function() {
-                // summary:
-                //      shows the next button on the content pane
-                console.log(this.declaredClass + '::showNextButton', arguments);
-
-                var pane = this.pages[this.currentPage];
-
-                if (!lang.isFunction(pane.next)) {
-                    domClass.add(this.nextButton, 'hidden');
-                    domAttr.set(this.nextButton, 'disabled', true);
-
-                    return;
-                }
-
-                domClass.remove(this.nextButton, 'hidden');
-            },
-            getAreaOfExtent: function(extent, buffer) {
-                // summary:
-                //      gets the area of an esri.geometry.Extent
-                // extent: esri/geometry/Extent
-                //      the extent to get the area from
-                // buffer: number
-                //      the number of feet to buffer by
-                console.log(this.declaredClass + '::getAreaOfExtent', arguments);
-
-                var length = extent.xmax - extent.xmin,
-                    width = extent.ymax - extent.ymin,
-                    meterBuffer = 0;
-
-                //coordinates are in meters, convert buffer to meters
-                if (buffer > 0) {
-                    meterBuffer = 0.3048 * buffer;
-                }
-
-                length = length + meterBuffer;
-                width = width + meterBuffer;
-
-                return length * width;
-            },
-            validate: function(evt) {
-                console.info(this.declaredClass + '::validate', arguments);
-
-                if (!this.valid()) {
-                    domClass.add(this.submitButton, 'hidden');
-                    domAttr.set(this.submitButton, 'disabled', true);
-
-                    events.stop(evt);
-                    return;
-                }
-            },
-            valid: function() {
-                // summary:
-                //      validates the download object
-                console.log(this.declaredClass + '::valid', arguments);
-
-                return array.every(this.validationProps, function(item) {
-                    if (item === 'buffer') {
-                        // 0 buffer creates false positive.
-                        return this.reportParams.get(item) > 0;
-                    }
-
-                    return !!this.reportParams.get(item);
-                }, this);
-            },
-            publishTool: function(evt) {
-                // summary:
-                //      publishes the event that a user wants to define their area of interest
-                // evt: button click event
-                console.log(this.declaredClass + '::publishTool', arguments);
-
-                var node = evt.target,
-                    prop = node.getAttribute('data-prop'),
-                    value = null;
-
-                if (this.activeTool) {
-                    domClass.remove(this.activeTool, 'btn-primary');
-                }
-
-                this.activeTool = node;
-                domClass.add(this.activeTool, 'btn-primary');
-
-                value = node.getAttribute('data-' + prop);
-
-                topic.publish('app/enable-tool', value);
-            },
-            initReportType: function() {
-                // summary:
-                //      sets up the gp for the report type
-                console.log(this.declaredClass + '::initReportType', arguments);
-
-                this.showNextPage();
-
-                var url;
-
-                switch (this.reportParams.get('type')) {
-                    case 'main':
-                        url = AGRC.urls.mainReport;
-                        break;
-                    case 'catex':
-                        url = AGRC.urls.catexReport;
-                        break;
-                }
-
-                this.initGp(url);
-            },
-            initGp: function(url) {
-                // summary:
-                //      description
-                console.info(this.declaredClass + '::initGp', arguments);
-
-                this.gp = new Geoprocessor(url);
-
-                this.own(
-                    this.gp.on('job-complete', lang.hitch(this, 'gpComplete')),
-                    this.gp.on('status-update', lang.hitch(this, 'statusUpdate')),
-                    this.gp.on('get-result-data-complete', lang.hitch(this, 'displayLink')),
-                    this.gp.on('job-cancel', lang.hitch(this, 'jobCancelled'))
-                );
-            },
-            submitJob: function() {
-                // summary:
-                //      sends the download filter to the gp service
-                console.log(this.declaredClass + '::submitJob', arguments);
-
-                if (!this.valid()) {
-                    this.messagebox.innerHTML = 'You haven\'t chosen all the required parts.';
-                    return;
-                }
-
-                this.messagebox.innerHTML = '';
-                this.downloadButton.innerHTML = 'Submitting';
-
-                var gpObject = this.transformObjectForGp();
-
-                this.gp.submitJob(gpObject);
-
-                domClass.remove(this.cancelButton, 'hidden');
-                domAttr.set(this.cancelButton, 'disabled', false);
-
-                domClass.add(this.backButton, 'hidden');
-                domAttr.set(this.backButton, 'disabled', true);
-
-                domAttr.set(this.submitButton, 'disabled', true);
-                domClass.add(this.submitButton, 'hidden');
-
-                domAttr.set(this.downloadButton, 'disabled', null);
-                domClass.remove(this.downloadButton, 'hidden');
-            },
-            transformObjectForGp: function() {
-                // summary:
-                //      transforms wizard params to be accepted by the gp service
-                //
-                console.log(this.declaredClass + '::transformObjectForGp', arguments);
-
-                //don't hate me since i copied this from bio-hazard
-                var start = new Date();
-
-                var dd = start.getDate() + '';
-                if (dd < 10) {
-                    dd = '0' + dd;
-                }
-
-                var mm = start.getMonth() + 1 + '';
-                if (mm < 10) {
-                    mm = '0' + mm;
-                }
-
-                var yyyy = start.getFullYear() + '';
-
-                var hh = start.getHours();
-                if (hh < 10) {
-                    hh = '0' + hh;
-                }
-
-                var minutes = start.getMinutes();
-                if (minutes < 10) {
-                    minutes = '0' + minutes;
-                }
-
-                var monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                var suffix = dd + monthNames[start.getMonth()] + yyyy + '_' + hh + minutes;
-
-                //Set units to feet
-                var units = 'feet';
-
-                //Acquire the report title from the user via window prompts
-                var reportName = this.reportParams.get('name');
-                var prjID = reportName.slice(0, 15) + ' ' + suffix;
-
-                var features = [];
-                var graphic = new Graphic(this.reportParams.get('geometry'));
-                features.push(graphic);
-                var featureVar = new FeatureSet();
-                featureVar.features = features;
-
-                var gpObject = {
-                    Project_Name: reportName,
-                    Project_ID: prjID,
-                    Dynamic_Project_Drawing: featureVar,
-                    Units_for_Buffer_Distance: units,
-                    Buffer_Distance: 0,
-                    Line_Source_Option: 0,
-                    Polygon_Source_Option: 3,
-                    Input_Fields: 0,
-                    Planner: this.email
+                inputFields = {
+                    default: 0,
+                    userInput: 1,
+                    attributes: 2
                 };
 
+
+            //Set units to feet
+            var units = 'feet',
+                reportName = data.name,
+                prjID = this.email + '_' + reportName,
+                features = [],
+                graphic = null,
+                featureSet = null;
+
+            var gpObject = {
+                Project_Name: reportName,
+                Project_ID: prjID,
+                Units_for_Buffer_Distance: units,
+                Buffer_Distance: 0,
+                Line_Source_Option: sourceOptions.noData,
+                Polygon_Source_Option: sourceOptions.userDrawn,
+                Input_Fields: inputFields.userInput,
+                Planner: this.email
+            };
+
+            if (graphic) {
+                graphic = new Graphic(data.geometry);
+                featureSet = new FeatureSet();
+
+                features.push(graphic);
+                featureSet.features = features;
+
+                gpObject.Dynamic_Project_Drawing = featureSet;
+
                 if (graphic.geometry.type === 'polyline') {
-                    gpObject.Buffer_Distance = this.reportParams.get('buffer');
-                    gpObject.Line_Source_Option = 3;
-                    gpObject.Polygon_Source_Option = 0;
-                    gpObject.Input_Fields = 1;
+                    gpObject.Buffer_Distance = data.buffer;
+                    gpObject.Line_Source_Option = sourceOptions.userDrawn;
+                    gpObject.Polygon_Source_Option = sourceOptions.noData;
+                    gpObject.Input_Fields = inputFields.userInput;
                 }
 
                 return gpObject;
-            },
-            cancelJob: function() {
-                // summary:
-                //      cancels the download job
-                console.log(this.declaredClass + '::cancelJob', arguments);
-
-                domAttr.set(this.cancelButton, 'disabled', null);
-                domClass.add(this.cancelButton, 'hidden');
-
-                domAttr.set(this.downloadButton, 'disabled', null);
-                domClass.add(this.downloadButton, 'hidden');
-
-                domAttr.remove(this.backButton, 'disabled');
-                domClass.remove(this.backButton, 'hidden');
-
-                domAttr.remove(this.submitButton, 'disabled');
-                domClass.remove(this.submitButton, 'hidden');
-
-                this.messagebox.innerHTML = '';
-
-                console.log('canceling job');
-                try {
-                    //throws error if it's already done and you try to cancel
-                    this.gp.cancelJob(this.jobId);
-                } catch (a) {}
-            },
-            jobCancelled: function() {
-                // summary:
-                //      successful cancel
-                console.log(this.declaredClass + '::jobCancelled', arguments);
-            },
-            statusUpdate: function(status) {
-                // summary:
-                //      status updates from the gp service
-                // jobinfo: esri/tasks/JobInfo
-                console.log(this.declaredClass + '::statusUpdate', arguments);
-
-                this.jobId = status.jobInfo.jobId;
-                this.messagebox.innerHTML = '';
-
-                switch (status.jobInfo.jobStatus) {
-                    case 'esriJobSubmitted':
-                        this.downloadButton.innerHTML = 'Submitted';
-                        break;
-                    case 'esriJobExecuting':
-                        this.downloadButton.innerHTML = 'Processing';
-                        break;
-                    case 'esriJobSucceeded':
-                        this.downloadButton.innerHTML = 'Requesting Report Url';
-                        break;
-                }
-            },
-            gpComplete: function(status) {
-                // summary:
-                //      description
-                // status: esri/tasks/JobInfo
-                console.log(this.declaredClass + '::gpComplete', arguments);
-
-                switch (status.jobInfo.jobStatus) {
-                    case 'esriJobCancelling':
-                    case 'esriJobCancelled':
-                        domClass.remove(this.backButton, 'hidden');
-                        domAttr.set(this.backButton, 'disabled', false);
-
-                        domClass.add(this.cancelButton, 'hidden');
-                        domAttr.set(this.cancelButton, 'disabled', true);
-
-                        domAttr.set(this.submitButton, 'disabled', false);
-                        domClass.remove(this.submitButton, 'hidden');
-
-                        domAttr.set(this.downloadButton, 'disabled', true);
-                        domClass.add(this.downloadButton, 'hidden');
-                        break;
-                    case 'esriJobSucceeded':
-                        this.gp.getResultData(status.jobInfo.jobId, 'url',
-                            function() {
-                                topic.publish('app/wizard-reset');
-                            },
-                            lang.hitch(this,
-                                function(eb) {
-                                    console.log(eb);
-                                    this.messagebox.innerHTML = eb;
-                                })
-                        );
-                        break;
-                    case 'esriJobFailed':
-                        domClass.remove(this.backButton, 'hidden');
-                        domAttr.set(this.backButton, 'disabled', false);
-
-                        domClass.add(this.cancelButton, 'hidden');
-                        domAttr.set(this.cancelButton, 'disabled', true);
-
-                        domAttr.set(this.submitButton, 'disabled', false);
-                        domClass.remove(this.submitButton, 'hidden');
-
-                        domAttr.set(this.downloadButton, 'disabled', true);
-                        domClass.add(this.downloadButton, 'hidden');
-
-                        this.messagebox.innerHTML = 'I\'m sorry but the job failed.';
-
-                        break;
-                }
-            },
-            displayLink: function(response) {
-                // summary:
-                //      sets the download link's href
-                // data: the esri/tasks/ParameterInfo object
-
-                //TODO: this.reset wizard
-                console.log(this.declaredClass + '::displayLink', arguments);
-
-                this.set('downloadUrl', response.result.value);
-                this.downloadButton.innerHTML = 'Download Report';
-
-                domClass.remove(this.backButton, 'hidden');
-                domAttr.set(this.backButton, 'disabled', false);
-
-                domClass.add(this.cancelButton, 'hidden');
-                domAttr.set(this.cancelButton, 'disabled', true);
-
-                domAttr.set(this.submitButton, 'disabled', false);
-                domClass.remove(this.submitButton, 'hidden');
-
-                domAttr.remove(this.downloadButton, 'disabled');
+            } else {
+                //send both as shapefile and figure out in python gp.
+                gpObject.Line_Source_Option = sourceOptions.shapefile;
+                gpObject.Polygon_Source_Option = sourceOptions.shapefile;
+                gpObject.zip = data.zip;
             }
-        });
+            return gpObject;
+        },
+        initReportType: function(data) {
+            // summary:
+            //      sets up the gp for the report type
+            //      this mucks with the gp internals and could easily break
+            console.log(this.declaredClass + '::initReportType', arguments);
+
+            if (data.shapefile) {
+                return data.type === 'catex' ? AGRC.urls.catexReport : AGRC.urls.mainReport;
+            }
+
+            if (data.type === 'catex') {
+                this.gp.url = AGRC.urls.catexReport;
+
+                if (!this.gp._url) {
+                    this.gp._url = {
+                        path: null,
+                        query: null
+                    };
+                }
+
+                this.gp._url.path = AGRC.urls.catexReport;
+            }
+        }
     });
+});

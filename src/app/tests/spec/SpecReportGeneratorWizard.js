@@ -23,6 +23,7 @@ require([
                 testWidget = new WidgetUnderTest({},
                     domConstruct.create('div', {}, win.body()));
                 testWidget.startup();
+
             });
             afterEach(function() {
                 testWidget.destroy();
@@ -33,8 +34,8 @@ require([
                 expect(testWidget).toEqual(jasmine.any(WidgetUnderTest));
             });
 
-            describe('valid', function() {
-                beforeEach(function() {
+            describe('CollectData', function() {
+                it('collects all the keys from the panes stateful object', function() {
                     var polyline = new Geometry({
                         "type": "polyline",
                         "paths": [
@@ -42,72 +43,6 @@ require([
                                 [242994.6799999997, 4514126.4399999995],
                                 [243094, 4514138.92],
                                 [243228.6299999999, 4514162.800000001],
-                                [243248.40000000037, 4514167.01],
-                                [243303.59999999963, 4514180.01],
-                                [243387, 4514202.51],
-                                [243414.40000000037, 4514211.01],
-                                [243497.90000000037, 4514238.51],
-                                [243553.40000000037, 4514259.01],
-                                [243608.40000000037, 4514281.01],
-                                [243960.09999999963, 4514434.01],
-                                [244041.90000000037, 4514469.01],
-                                [244069.40000000037, 4514480.01],
-                                [244258.7000000002, 4514563.51],
-                                [244286.7999999998, 4514573.51],
-                                [244313.7000000002, 4514586.01],
-                                [244642.40000000037, 4514728.51],
-                                [244697.40000000037, 4514752.51],
-                                [244753, 4514775.51],
-                                [244836.7000000002, 4514808.01],
-                                [244921.59999999963, 4514838.51],
-                                [245036.40000000037, 4514876.01],
-                                [245095, 4514893.51],
-                                [245184.2999999998, 4514918.01],
-                                [245250.25999999978, 4514934.470000001],
-                                [245363.09999999963, 4514959.51],
-                                [245422.09999999963, 4514971.01],
-                                [245452, 4514975.51],
-                                [245511, 4514986.51],
-                                [245571.40000000037, 4514996.01],
-                                [245631, 4515003.51],
-                                [245691.09999999963, 4515009.51],
-                                [245828.7000000002, 4515021.51],
-                                [245903.90000000037, 4515026.51],
-                                [246024.7000000002, 4515030.01],
-                                [246085.2999999998, 4515030.01],
-                                [246176.2000000002, 4515028.01],
-                                [246267, 4515023.51],
-                                [246328.09999999963, 4515019.51],
-                                [246389.7999999998, 4515014.51],
-                                [246450.90000000037, 4515008.01],
-                                [246542.7000000002, 4514996.51],
-                                [246603.7000000002, 4514987.51],
-                                [246694.09999999963, 4514971.51],
-                                [246763.40000000037, 4514957],
-                                [246873.40000000037, 4514933.01],
-                                [246962.90000000037, 4514910.51],
-                                [247080.8799999999, 4514877.460000001],
-                                [247111.7999999998, 4514869.01],
-                                [247485.5, 4514765.51],
-                                [247715, 4514703.01],
-                                [247801.2000000002, 4514678.51],
-                                [247976.90000000037, 4514630.51],
-                                [248063.90000000037, 4514607.51],
-                                [248327.40000000037, 4514541.01],
-                                [248475.7999999998, 4514506.01],
-                                [248635.7999999998, 4514470.01],
-                                [248648.59999999963, 4514467.51],
-                                [248746.59999999963, 4514446.51],
-                                [249047.09999999963, 4514386.51],
-                                [249207.7999999998, 4514358.51],
-                                [249508.2000000002, 4514309.01],
-                                [249728.2000000002, 4514275.800000001],
-                                [249813.09999999963, 4514263.51],
-                                [249967.2999999998, 4514245.01],
-                                [250122, 4514225.01],
-                                [250434.90000000037, 4514189.01],
-                                [250591.7999999998, 4514172.51],
-                                [250748.59999999963, 4514156.51],
                                 [250811.23000000045, 4514150.75]
                             ]
                         ],
@@ -129,20 +64,65 @@ require([
                         "_partwise": null
                     });
 
-                    testWidget.reportParams.set('type', 'main');
-                    testWidget.reportParams.set('name', 'unit test');
-                    testWidget.reportParams.set('buffer', 0);
-                    testWidget.reportParams.set('geometry', polyline);
+                    testWidget.panes[0].reportParams.set('type', 'main');
+                    testWidget.panes[1].reportParams.set('buffer', 1);
+                    testWidget.panes[1].reportParams.set('geometry', polyline);
+                    testWidget.panes[2].reportParams.set('name', 'my report');
+
+                    var data = testWidget.collectData();
+                    expect(data).toEqual({
+                        type: 'main',
+                        buffer: 1,
+                        geometry: polyline,
+                        name: 'my report',
+                        shapefile: false
+                    });
                 });
+            });
 
-                it('it should not be valid with 0 buffer', function() {
-                    expect(testWidget.valid()).toEqual(false);
-                });
+            describe('valid', function() {
+                it('validates all panes', function() {
+                    var polyline = new Geometry({
+                        "type": "polyline",
+                        "paths": [
+                            [
+                                [242994.6799999997, 4514126.4399999995],
+                                [243094, 4514138.92],
+                                [243228.6299999999, 4514162.800000001],
+                                [250811.23000000045, 4514150.75]
+                            ]
+                        ],
+                        "_path": 0,
+                        "spatialReference": {
+                            "wkid": 26912,
+                            "latestWkid": 26912
+                        },
+                        "_extent": {
+                            "xmin": 242994.6799999997,
+                            "ymin": 4514126.4399999995,
+                            "xmax": 250811.23000000045,
+                            "ymax": 4515030.01,
+                            "spatialReference": {
+                                "wkid": 26912,
+                                "latestWkid": 26912
+                            }
+                        },
+                        "_partwise": null
+                    });
 
-                it('it should be valid with 1 buffer', function() {
-                    testWidget.reportParams.set('buffer', 1);
+                    testWidget.panes[0].reportParams.set('type', 'main');
+                    testWidget.panes[1].reportParams.set('buffer', 1);
+                    testWidget.panes[1].reportParams.set('geometry', polyline);
+                    testWidget.panes[2].reportParams.set('name', 'my report');
 
-                    expect(testWidget.valid()).toEqual(true);
+                    spyOn(testWidget.panes[0], 'validate').andCallThrough();
+                    spyOn(testWidget.panes[1], 'validate').andCallThrough();
+                    spyOn(testWidget.panes[2], 'validate').andCallThrough();
+
+                    expect(testWidget.isValid()).toEqual(true);
+                    expect(testWidget.panes[0].validate).toHaveBeenCalled();
+                    expect(testWidget.panes[1].validate).toHaveBeenCalled();
+                    expect(testWidget.panes[2].validate).toHaveBeenCalled();
                 });
             });
         });
