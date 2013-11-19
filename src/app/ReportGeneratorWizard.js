@@ -164,7 +164,7 @@ define([
                 userDrawn: 3
             },
                 inputFields = {
-                    default: 0,
+                    normal: 0,
                     userInput: 1,
                     attributes: 2
                 };
