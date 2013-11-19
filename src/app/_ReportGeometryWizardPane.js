@@ -14,7 +14,7 @@ define([
 
     'esri/request',
 
-    'agrc/modules/string',
+    'agrc/modules/String',
 
     'app/_ReportWizardPaneBaseMixin'
 ], function(

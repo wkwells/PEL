@@ -5,8 +5,6 @@ define([
     'dojo/_base/lang',
     'dojo/_base/array',
 
-    'dojo/request/iframe',
-
     'dijit/_WidgetBase',
     'dijit/_TemplatedMixin',
     'dijit/_WidgetsInTemplateMixin',
@@ -27,8 +25,6 @@ define([
     declare,
     lang,
     array,
-
-    iframe,
 
     _WidgetBase,
     _TemplatedMixin,
