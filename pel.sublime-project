@@ -10,6 +10,8 @@
             "dist/dijit",
             "dist/bootstrap",
             "dist/esri",
+            "dist/jquery",
+            "dist/mustache",
             "src/dojo",
             "src/dojox",
             "src/util",
@@ -20,20 +22,24 @@
             ".grunt"
         ],
         "file_exclude_patterns": [
+            "dist/index.html",
+            "dist/edit.html",
             "*.sublime-workspace"
         ],
         "path": "/"
     }],
-    "build_systems": [{
-        "name": "AGRC Build",
-        "working_dir": "$project_path",
-        "osx": {
-            "cmd": ["bash ./build.sh"],
-            "shell": true
-        },
-        "windows": {
-            "cmd": ["build.bat"],
-            "path": "C:\\Program Files (x86)\\Java\\jre7\\bin\\;C:\\Program Files (x86)\\Git\\bin;" //install http://msysgit.github.io/
+    "build_systems": [
+        {
+            "name": "AGRC Build",
+            "working_dir": "$project_path",
+            "osx": {
+                "cmd": ["bash ./build.sh"],
+                "shell": true
+            },
+            "windows": {
+                "cmd": ["build.bat"],
+                "path": "C:\\Program Files (x86)\\Java\\jre7\\bin\\;C:\\Program Files (x86)\\Git\\bin;"
+            }
         }
-    }]
+    ]
 }

@@ -31,7 +31,7 @@ define([
 ) {
     // summary:
     //      A mixin for shared code between the panes in LoginRegistration
-    return declare('app._ReportWizardControlPanel', [_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
+    return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: template,
 
         widgetsInTemplate: true,
@@ -51,7 +51,7 @@ define([
         constructor: function() {
             // summary:
             //      constructor
-            console.log(this.declaredClass + '::constructor', arguments);
+            console.log('app._ReportWizardControlPanel::constructor', arguments);
 
             var then = this;
 
@@ -81,7 +81,7 @@ define([
             //       This is fired after all properties of a widget are defined, 
             //       and the document fragment representing the widget is created—but
             //       before the fragment itself is added to the main document.
-            console.log(this.declaredClass + '::postCreate', arguments);
+            console.log('app._ReportWizardControlPanel::postCreate', arguments);
 
             var last = this.panes.length - 1;
 
@@ -112,7 +112,7 @@ define([
         setupConnections: function() {
             // summary:
             //      connects, subscribes, watches
-            console.log(this.declaredClass + '::setupConnections', arguments);
+            console.log('app._ReportWizardControlPanel::setupConnections', arguments);
 
             this.pointer.watch('position', lang.hitch(this, '_changePosition'));
 
@@ -127,7 +127,7 @@ define([
         next: function() {
             // summary:
             //      shows the next page
-            console.info(this.declaredClass + '::next', arguments);
+            console.info('app._ReportWizardControlPanel::next', arguments);
 
             var currentPosition = this.pointer.get('position');
             currentPosition = currentPosition + 1;
@@ -137,7 +137,7 @@ define([
         previous: function() {
             // summary:
             //      goes to the previous page
-            console.log(this.declaredClass + '::previous', arguments);
+            console.log('app._ReportWizardControlPanel::previous', arguments);
 
             var currentPosition = this.pointer.get('position');
 
@@ -150,7 +150,7 @@ define([
             //      handles the displaying of the panes
             // newPosition: number
             //      the new position to move the wizard to
-            console.log(this.declaredClass + '::_changePosition', arguments);
+            console.log('app._ReportWizardControlPanel::_changePosition', arguments);
 
             var newPosition = this.pointer.get('position');
             var pane = this.panes[newPosition];
@@ -163,7 +163,7 @@ define([
         updateButtonState: function() {
             // summary:
             //      sets the visibility and what buttons to show/hide
-            console.log(this.declaredClass + '::updateButtonState', arguments);
+            console.log('app._ReportWizardControlPanel::updateButtonState', arguments);
 
             var index = this.pointer.get('position'),
                 hideButton = true,
@@ -267,7 +267,7 @@ define([
         _setButtonState: function(args) {
             // summary:
             //      shows the next button
-            console.log(this.declaredClass + '::_setButtonState', arguments);
+            console.log('app._ReportWizardControlPanel::_setButtonState', arguments);
 
             if (!args.node) {
                 if (args.button === 'next') {
@@ -294,7 +294,7 @@ define([
             // summary:
             //      submits the form
             // evt: mouse click event
-            console.log(this.declaredClass + '::submit', arguments);
+            console.log('app._ReportWizardControlPanel::submit', arguments);
 
             var valid = this.parentWidget.submit(evt);
             if (!valid) {
@@ -339,7 +339,7 @@ define([
         cancel: function() {
             // summary:
             //      cancels the wizard submission
-            console.log(this.declaredClass + '::cancel', arguments);
+            console.log('app._ReportWizardControlPanel::cancel', arguments);
 
             this._setButtonState({
                 node: this.cancelButton,
@@ -372,7 +372,7 @@ define([
             // summary:
             //      updates the ui for gp updates
             // status
-            console.log(this.declaredClass + '::_gpUpdating', arguments);
+            console.log('app._ReportWizardControlPanel::_gpUpdating', arguments);
 
             this.messageBox.innerHTML = '';
 
@@ -392,7 +392,7 @@ define([
             // summary:
             //      the gp has finished reset buttons bases on status
             // status: esri/tasks/JobInfo
-            console.log(this.declaredClass + '::_gpComplete', arguments);
+            console.log('app._ReportWizardControlPanel::_gpComplete', arguments);
 
             switch (status.jobInfo.jobStatus) {
                 case 'esriJobCancelling':
@@ -463,7 +463,7 @@ define([
             // summary:
             //      got the result from the server
             // response
-            console.log(this.declaredClass + '::_gpResultComplete', arguments);
+            console.log('app._ReportWizardControlPanel::_gpResultComplete', arguments);
 
             this.productButton.innerHTML = 'Download Report';
 
@@ -490,7 +490,7 @@ define([
                 hideButton: false,
                 disableButton: false
             });
-            
+
             domAttr.set(this.productButton, 'href', response.result.value);
         }
     });

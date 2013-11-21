@@ -18,6 +18,7 @@ define([
     'esri/tasks/FeatureSet',
     'esri/graphic',
 
+
     'dijit/layout/StackContainer'
 ], function(
     template,
@@ -41,27 +42,27 @@ define([
 ) {
     // summary:
     //      Handles retrieving and displaying the data in the popup.
-    return declare('app.ReportGeneratorWizard', [_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, AsyncGp], {
+    return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, AsyncGp], {
         baseClass: 'report-wizard',
 
         widgetsInTemplate: true,
 
         templateString: template,
 
-        //the planners email
-        email: null,
+        //the planners details
+        planner: null,
 
         constructor: function() {
             // summary:
             //      constructor
-            console.log(this.declaredClass + '::constructor', arguments);
+            console.log('app.ReportGeneratorWizard::constructor', arguments);
 
             this.inherited(arguments);
         },
         postCreate: function() {
             // summary:
             //      dom is ready
-            console.info(this.declaredClass + '::postCreate', arguments);
+            console.info('app.ReportGeneratorWizard::postCreate', arguments);
 
             this.inherited(arguments);
 
@@ -72,7 +73,7 @@ define([
         setupWizard: function() {
             // summary:
             //      sets up the wizard pane functionality
-            console.log(this.declaredClass + '::setupWizard', arguments);
+            console.log('app.ReportGeneratorWizard::setupWizard', arguments);
 
             var reportTypePane = new TypePane({
                 parentWidget: this
@@ -99,14 +100,14 @@ define([
         setupConnections: function() {
             // summary:
             //      sets up the connections obviously
-            console.log(this.declaredClass + '::setupConnections', arguments);
+            console.log('app.ReportGeneratorWizard::setupConnections', arguments);
 
             this.subscribe('LoginRegister/sign-in-success', lang.hitch(this, function(response) {
-                this.email = response.user.email;
+                this.planner = response.user;
             }));
         },
         isValid: function() {
-            console.info(this.declaredClass + '::isValid', arguments);
+            console.info('app.ReportGeneratorWizard::isValid', arguments);
 
             // validate all the panes
             return array.every(this.panes, function(pane) {
@@ -117,7 +118,7 @@ define([
             // summary:
             //      handles the submitting of the wizard
             // evt: the mouse click or submission event
-            console.log(this.declaredClass + '::submit', arguments);
+            console.log('app.ReportGeneratorWizard::submit', arguments);
 
             if (!this.isValid()) {
                 return false;
@@ -137,7 +138,7 @@ define([
             // summary:
             //      collects the data parts from the various panes
             //
-            console.log(this.declaredClass + '::collectData', arguments);
+            console.log('app.ReportGeneratorWizard::collectData', arguments);
             var data = {};
 
             array.forEach(this.panes, function(pane) {
@@ -156,7 +157,7 @@ define([
             //      modifies the data for the gp service
             // data: object
             //      the data collected from the wizard panes
-            console.log(this.declaredClass + '::transformData', arguments);
+            console.log('app.ReportGeneratorWizard::transformData', arguments);
             var sourceOptions = {
                 noData: 0,
                 shapefile: 1,
@@ -169,11 +170,10 @@ define([
                     attributes: 2
                 };
 
-
             //Set units to feet
             var units = 'feet',
                 reportName = data.name,
-                prjID = this.email + '_' + reportName,
+                prjID = this.planner.name,
                 features = [],
                 graphic = null,
                 featureSet = null;
@@ -186,10 +186,10 @@ define([
                 Line_Source_Option: sourceOptions.noData,
                 Polygon_Source_Option: sourceOptions.userDrawn,
                 Input_Fields: inputFields.userInput,
-                Planner: this.email
+                Planner: this.planner.email
             };
 
-            if (graphic) {
+            if (data.geometry) {
                 graphic = new Graphic(data.geometry);
                 featureSet = new FeatureSet();
 
@@ -218,7 +218,7 @@ define([
             // summary:
             //      sets up the gp for the report type
             //      this mucks with the gp internals and could easily break
-            console.log(this.declaredClass + '::initReportType', arguments);
+            console.log('app.ReportGeneratorWizard::initReportType', arguments);
 
             if (data.shapefile) {
                 return data.type === 'catex' ? AGRC.urls.catexReport : AGRC.urls.mainReport;

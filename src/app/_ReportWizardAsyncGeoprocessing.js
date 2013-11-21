@@ -29,7 +29,7 @@ define([
 ) {
     // summary:
     //      A mixin for shared code between the panes in LoginRegistration
-    return declare('app._ReportWizardAsyncGeoprocessing', [_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
+    return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
         widgetsInTemplate: true,
 
         baseClass: 'report-wizard',
@@ -44,7 +44,7 @@ define([
 
         // parentWidget: a reference to the parent widget
         parentWidget: null,
-        
+
         // url: url to gp tool
         url: null,
 
@@ -58,12 +58,12 @@ define([
 
             this.initGp(this.url);
         },
-        initGp: function (url) {
+        initGp: function(url) {
             // summary:
             //      creates the gp
-            // 
-            console.log(this.declaredClass + '::initGp', arguments);
-         
+            //
+            console.log('app._ReportWizardAsyncGeoprocessing::initGp', arguments);
+
             this.gp = new Geoprocessor(url);
 
             this.own(
@@ -83,7 +83,7 @@ define([
             // summary:
             //      cancels the download job
             console.log('app._ReportWizardAsyncGeoprocessing::cancelJob', arguments);
-            
+
             try {
                 //throws error if it's already done and you try to cancel
                 this.gp.cancelJob(this.jobId);

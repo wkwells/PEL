@@ -45,7 +45,7 @@ define([
 
     routes
 ) {
-    return declare('app/GeometryFromRoute', [_WidgetBase, _TemplatedMixin], {
+    return declare([_WidgetBase, _TemplatedMixin], {
         baseClass: 'geometry-from-route',
 
         templateString: template,
@@ -61,7 +61,7 @@ define([
         postCreate: function() {
             // summary:
             //      its a postCreate
-            console.log(this.declaredClass + '::postCreate', arguments);
+            console.log('app.GeometryFromRoute::postCreate', arguments);
 
             var that = this;
 
@@ -86,7 +86,7 @@ define([
         hide: function() {
             // summary:
             //      hides the modal dialog
-            console.log(this.declaredClass + '::hideDialog', arguments);
+            console.log('app.GeometryFromRoute::hideDialog', arguments);
 
             $(this.modalDiv).modal('hide');
         },
@@ -94,7 +94,7 @@ define([
             // summary:
             //      shows the login modal
             //
-            console.log(this.declaredClass + '::show', arguments);
+            console.log('app.GeometryFromRoute::show', arguments);
 
             $(this.modalDiv).modal('show');
         },
@@ -102,7 +102,7 @@ define([
             // summary:
             //      submits the values to the gp service
             //
-            console.log(this.declaredClass + '::submit', arguments);
+            console.log('app.GeometryFromRoute::submit', arguments);
 
             var valid = this.validate();
 
@@ -116,7 +116,7 @@ define([
             // summary:
             //      updates the values from the widget
             // evt
-            console.log(this.declaredClass + '::updateValues', arguments);
+            console.log('app.GeometryFromRoute::updateValues', arguments);
 
             this.routeName = this.routeNode.value || 0;
             this.start = +this.startNode.value || 0;
@@ -128,7 +128,7 @@ define([
             // summary:
             //      validates inputs
             //
-            console.log(this.declaredClass + '::validate', arguments);
+            console.log('app.GeometryFromRoute::validate', arguments);
 
             var valid = true;
 
@@ -157,7 +157,7 @@ define([
         initGp: function(url) {
             // summary:
             //      description
-            console.info(this.declaredClass + '::initGp', arguments);
+            console.info('app.GeometryFromRoute::initGp', arguments);
 
             this.gp = new Geoprocessor(url);
 
@@ -169,7 +169,7 @@ define([
         submitJob: function() {
             // summary:
             //      sends the download filter to the gp service
-            console.log(this.declaredClass + '::submitJob', arguments);
+            console.log('app.GeometryFromRoute::submitJob', arguments);
 
             domAttr.set(this.submitButton, 'disabled', true);
             this.errorDiv.innerHTML = '';
@@ -186,7 +186,7 @@ define([
             // summary:
             //      description
             // status: esri/tasks/JobInfo
-            console.log(this.declaredClass + '::gpComplete', arguments);
+            console.log('app.GeometryFromRoute::gpComplete', arguments);
 
             domAttr.set(this.submitButton, 'disabled', false);
 
@@ -214,7 +214,7 @@ define([
         onFail: function() {
             // summary:
             //      description
-            console.log(this.declaredClass + '::onFail', arguments);
+            console.log('app.GeometryFromRoute::onFail', arguments);
 
             domAttr.remove(this.submitButton, 'disabled');
             this.errorDiv.innerHTML = 'Your mile posts may be out of range for the route. ';
@@ -224,7 +224,7 @@ define([
             // summary:
             //      sets the download link's href
             // data: the esri/tasks/ParameterInfo object
-            console.log(this.declaredClass + '::displayResult', arguments);
+            console.log('app.GeometryFromRoute::displayResult', arguments);
 
             this.hide();
 

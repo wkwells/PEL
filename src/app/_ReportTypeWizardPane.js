@@ -21,7 +21,7 @@ define([
 ) {
     // summary:
     //      A mixin for shared code between the panes in LoginRegistration
-    return declare('app._ReportTypeWizardPage', [_WizardPaneBase], {
+    return declare([_WizardPaneBase], {
 
         templateString: template,
 
@@ -31,7 +31,7 @@ define([
         constructor: function() {
             // summary:
             //      constructor
-            console.log(this.declaredClass + '::constructor', arguments);
+            console.log('app._ReportTypeWizardPage::constructor', arguments);
 
             this.reportParams = new Stateful({
                 type: null,
@@ -40,12 +40,12 @@ define([
                 }
             });
         },
-        isValid: function () {
+        isValid: function() {
             // summary:
             //      another validation without event emittion
-            // 
-            console.log(this.declaredClass + '::isValid', arguments);
-            
+            //
+            console.log('app._ReportTypeWizardPage::isValid', arguments);
+
             var valid = this.validate();
 
             var hideButton = true,
@@ -63,14 +63,14 @@ define([
             // summary:
             //      validates email and password values on keyup event
             // returns: Boolean
-            console.log(this.declaredClass + '::validate', arguments);
-  
-            var valid = !!this.reportParams.get('type');
+            console.log('app._ReportTypeWizardPage::validate', arguments);
+
+            var valid = !! this.reportParams.get('type');
 
             return valid;
         },
         update: function(evt) {
-            console.info(this.declaredClass + '::update', arguments);
+            console.info('app._ReportTypeWizardPage::update', arguments);
 
             var data = this.getDataFromButtonClick(evt);
             this.reportParams.set(data.prop, data.value);

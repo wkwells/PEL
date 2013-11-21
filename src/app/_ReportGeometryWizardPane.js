@@ -39,7 +39,7 @@ define([
 ) {
     // summary:
     //      A mixin for shared code between the panes in LoginRegistration
-    return declare('app._ReportGeometryWizardPane', [_WizardPaneBase], {
+    return declare([_WizardPaneBase], {
 
         templateString: template,
 
@@ -52,7 +52,7 @@ define([
         constructor: function() {
             // summary:
             //      constructor
-            console.log(this.declaredClass + '::constructor', arguments);
+            console.log('app._ReportGeometryWizardPane::constructor', arguments);
 
             this.numbersOnly = new RegExp('^[0-9.]+$');
             this.reportParams = new Stateful({
@@ -70,7 +70,7 @@ define([
             //       This is fired after all properties of a widget are defined, 
             //       and the document fragment representing the widget is created—but
             //       before the fragment itself is added to the main document.
-            console.log(this.declaredClass + '::postCreate', arguments);
+            console.log('app._ReportGeometryWizardPane::postCreate', arguments);
 
             this.setupConnections();
             this.setupDisplay();
@@ -78,7 +78,7 @@ define([
         setupConnections: function() {
             // summary:
             //      connects, subscribes, watches
-            console.log(this.declaredClass + '::setupConnections', arguments);
+            console.log('app._ReportGeometryWizardPane::setupConnections', arguments);
 
             this.subscribe('app/report-wizard-geometry', lang.hitch(this, 'setGeometry'));
 
@@ -96,7 +96,7 @@ define([
             // summary:
             //      hides and shows nodes in the pane
             // 
-            console.log(this.declaredClass + '::setupDisplay', arguments);
+            console.log('app._ReportGeometryWizardPane::setupDisplay', arguments);
 
             domClass.add(this.shapefileGroup, 'hidden');
             domClass.add(this.drawingGroup, 'hidden');
@@ -105,7 +105,7 @@ define([
             // summary:
             //      updates the buffer radius
             // evt
-            console.log(this.declaredClass + '::update', arguments);
+            console.log('app._ReportGeometryWizardPane::update', arguments);
 
             var data = this.getDataFromTextboxEvent(evt);
             this.reportParams.set(data.prop, data.value);
@@ -114,7 +114,7 @@ define([
             // summary:
             //      validation without events or ui updates
             // 
-            console.log(this.declaredClass + '::isValid', arguments);
+            console.log('app._ReportGeometryWizardPane::isValid', arguments);
 
             var valid = this.validate();
 
@@ -133,7 +133,7 @@ define([
             // summary:
             //      validates email and password values on keyup event
             // returns: Boolean
-            console.log(this.declaredClass + '::validate', arguments);
+            console.log('app._ReportGeometryWizardPane::validate', arguments);
 
             if (this.reportParams.get('shapefile')) {
                 return this.validateAsShapefile();
@@ -145,7 +145,7 @@ define([
             // summary:
             //      validates the pane when shapefiles are selected
             // 
-            console.log(this.declaredClass + '::validateAsShapefile', arguments);
+            console.log('app._ReportGeometryWizardPane::validateAsShapefile', arguments);
 
             var file = this.reportParams.get('zip'),
                 state = true,
@@ -163,7 +163,7 @@ define([
         validateDrawing: function() {
             // summary:
             //      validates the unique geometry view
-            console.log(this.declaredClass + '::validateDrawing', arguments);
+            console.log('app._ReportGeometryWizardPane::validateDrawing', arguments);
 
             var buffer = this.reportParams.buffer,
                 geometry = this.reportParams.geometry;
@@ -203,7 +203,7 @@ define([
             // summary:
             //      topic subscription to geometry drawing
             // geom: the geometry of the shape to use for the report
-            console.log(this.declaredClass + '::setGeometry', arguments);
+            console.log('app._ReportGeometryWizardPane::setGeometry', arguments);
 
             // set the geometry
             this.reportParams.set('geometry', geom);
@@ -216,7 +216,7 @@ define([
             //      the extent to get the area from
             // buffer: number
             //      the number of feet to buffer by
-            console.log(this.declaredClass + '::getAreaOfExtent', arguments);
+            console.log('app._ReportGeometryWizardPane::getAreaOfExtent', arguments);
 
             var length = extent.xmax - extent.xmin,
                 width = extent.ymax - extent.ymin,
@@ -236,7 +236,7 @@ define([
             // summary:
             //      uploads the file to the gp service
             // 
-            console.log(this.declaredClass + '::uploadFile', arguments);
+            console.log('app._ReportGeometryWizardPane::uploadFile', arguments);
 
             esriRequest({
                 url: AGRC.urls.uploadUrl,
@@ -260,7 +260,7 @@ define([
             //     "date": 1384453020224,
             //     "committed": true
             // }
-            console.log(this.declaredClass + '::_setUploadedFileId', arguments);
+            console.log('app._ReportGeometryWizardPane::_setUploadedFileId', arguments);
 
             if (!response.success)
                 return;
@@ -277,7 +277,7 @@ define([
             // summary:
             //      publishes the event that a user wants to define their area of interest
             // evt: button click event
-            console.log(this.declaredClass + '::toolChoice', arguments);
+            console.log('app._ReportGeometryWizardPane::toolChoice', arguments);
 
             var data = this.getDataFromButtonClick(evt);
 

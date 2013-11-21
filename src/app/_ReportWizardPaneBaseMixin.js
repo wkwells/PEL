@@ -6,7 +6,7 @@ define([
     'dijit/_WidgetBase',
     'dijit/_TemplatedMixin',
     'dijit/_WidgetsInTemplateMixin',
-    
+
     'dijit/layout/ContentPane'
 ], function(
     declare,
@@ -19,11 +19,11 @@ define([
 ) {
     // summary:
     //      A mixin for shared code between the panes in LoginRegistration
-    return declare('app._ReportWizardPaneBaseMixin', [_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
+    return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
         widgetsInTemplate: true,
 
         baseClass: 'report-wizard',
-        
+
         // parameters passed in via the constructor
 
         // parentWidget: a reference to the parent widget

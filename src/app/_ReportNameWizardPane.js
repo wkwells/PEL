@@ -17,13 +17,13 @@ define([
 ) {
     // summary:
     //      A mixin for shared code between the panes in LoginRegistration
-    return declare('app._ReportNameWizardPane', [_WizardPaneBase], {
+    return declare([_WizardPaneBase], {
         templateString: template,
 
         constructor: function() {
             // summary:
             //      constructor
-            console.log(this.declaredClass + '::constructor', arguments);
+            console.log('app._ReportNameWizardPane::constructor', arguments);
 
             this.reportParams = new Stateful({
                 name: null,
@@ -36,8 +36,8 @@ define([
             // summary:
             //      validates email and password values on keyup event
             // returns: Boolean
-            console.log(this.declaredClass + '::validate', arguments);
-            
+            console.log('app._ReportNameWizardPane::validate', arguments);
+
             var name = this.reportParams.get('name');
 
             if (!name) {
@@ -46,12 +46,12 @@ define([
 
             return name.length > 0;
         },
-        isValid: function () {
+        isValid: function() {
             // summary:
             //      validates without ui or events
-            // 
-            console.log(this.declaredClass + '::isValid', arguments);
-         
+            //
+            console.log('app._ReportNameWizardPane::isValid', arguments);
+
             var valid = this.validate();
 
             var hideButton = true,
@@ -66,7 +66,7 @@ define([
             return valid;
         },
         update: function(evt) {
-            console.info(this.declaredClass + '::update', arguments);
+            console.info('app._ReportNameWizardPane::update', arguments);
 
             var data = this.getDataFromTextboxEvent(evt);
 
