@@ -102,7 +102,8 @@ define([
 
                 this.login = new LoginRegister({
                     appName: AGRC.appName,
-                    logoutDiv: this.logoutDiv
+                    logoutDiv: this.logoutDiv,
+                    securedServicesBaseUrl: AGRC.urls.baseUrl
                 });
             },
             startup: function() {

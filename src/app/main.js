@@ -5,6 +5,7 @@ define([
 ], function(
     parser
 ) {
+    var baseUrl = '/arcgis/rest/services/PEL/Toolbox/GPServer';
     window.AGRC = {
         // errorLogger: ijit.modules.ErrorLogger
         errorLogger: null,
@@ -32,11 +33,12 @@ define([
         extentMaxArea: 1210000000,
 
         urls: {
+            baseUrl: baseUrl,
             vector: 'http://mapserv.utah.gov/arcgis/rest/services/BaseMaps/Vector/MapServer',
-            mainReport: '/arcgis/rest/services/PEL/Toolbox/GPServer/PEL_Main',
-            catexReport: '/arcgis/rest/services/PEL/Toolbox/GPServer/PEL_CatEx',
-            routeMilepost: '/arcgis/rest/services/PEL/Toolbox/GPServer/Milepost_Segment',
-            uploadUrl: '/arcgis/rest/services/PEL/Toolbox/GPServer/uploads/upload'
+            mainReport: baseUrl + 'PEL_Main',
+            catexReport: baseUrl + 'PEL_CatEx',
+            routeMilepost: baseUrl + 'Milepost_Segment',
+            uploadUrl: baseUrl + 'uploads/upload'
         }
     };
 
