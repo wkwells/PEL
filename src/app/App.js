@@ -98,17 +98,16 @@ define([
 
             this.inherited(arguments);
 
-
-                this.login = new LoginRegister({
-                    appName: AGRC.appName,
-                    logoutDiv: this.logoutDiv,
-                    securedServicesBaseUrl: AGRC.urls.baseUrl
-                });
-            },
-            startup: function() {
-                // summary:
-                //      Fires after postCreate when all of the child widgets are finished laying out.
-                console.log(this.declaredClass + '::' + arguments.callee.nom, arguments);
+            this.login = new LoginRegister({
+                appName: AGRC.appName,
+                logoutDiv: this.logoutDiv,
+                securedServicesBaseUrl: AGRC.urls.baseUrl
+            });
+        },
+        startup: function() {
+            // summary:
+            //      Fires after postCreate when all of the child widgets are finished laying out.
+            console.log('app.app::startup', arguments);
 
             var toggler,
                 geocoder,
