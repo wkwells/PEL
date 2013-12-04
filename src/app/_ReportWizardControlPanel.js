@@ -153,12 +153,15 @@ define([
             console.log('app._ReportWizardControlPanel::_changePosition', arguments);
 
             var newPosition = this.pointer.get('position');
-            var pane = this.panes[newPosition];
+            var showingPane = this.panes[newPosition];
 
-            this.parentWidget.sc.selectChild(pane);
+            var leavingPane = this.parentWidget.sc.selectedChildWidget;
+
+            this.parentWidget.sc.selectChild(showingPane);
 
             this.updateButtonState();
-            pane.onShow();
+            showingPane.onShow();
+            leavingPane.onHide();
         },
         updateButtonState: function() {
             // summary:
