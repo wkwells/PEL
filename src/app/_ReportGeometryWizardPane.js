@@ -289,6 +289,8 @@ define([
             domClass.add(this.activeTool, 'btn-primary');
 
             if (data.value === 'shapefile') {
+                topic.publish('app/enable-tool', 'shapefile');
+
                 this.reportParams.set('shapefile', true);
                 this.reportParams.geometry = null;
 
@@ -304,6 +306,14 @@ define([
             topic.publish('app/enable-tool', data.value);
 
             return data.value;
+        },
+        onHide: function() {
+            // summary:
+            //      performs actions when pane is hidden
+            // 
+            console.log('app._ReportGeometryWizardPane::onHide', arguments);
+         
+            topic.publish('app/enable-tool');
         }
     });
 });

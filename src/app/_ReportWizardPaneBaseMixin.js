@@ -71,6 +71,11 @@ define([
             console.log('app._ReportWizardPaneBaseMixin::onShow', arguments);
 
             return this.isValid();
+        },
+        onHide: function() {
+            // summary:
+            //      onShowates the widget
+            console.log('app._ReportWizardPaneBaseMixin::onHide', arguments);
         }
     });
 });

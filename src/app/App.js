@@ -179,11 +179,19 @@ define([
             // tool: string: route-mile-post, line, polygon
             console.log('app.app::activateTool', arguments);
 
+            this.drawingToolbar.deactivate();
+
             if (!tool) {
                 return;
             }
 
             switch (tool) {
+                case 'shapefile':
+                    if (this.activeGraphic) {
+                        this.map.graphics.remove(this.activeGraphic);
+                        this.activeGraphic = null;
+                    }
+                    break;
                 case 'route-mile-post':
                     this.routeMilepost.show();
                     break;
