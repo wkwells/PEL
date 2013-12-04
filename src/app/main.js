@@ -35,10 +35,10 @@ define([
         urls: {
             baseUrl: baseUrl,
             vector: 'http://mapserv.utah.gov/arcgis/rest/services/BaseMaps/Vector/MapServer',
-            mainReport: baseUrl + 'PEL_Main',
-            catexReport: baseUrl + 'PEL_CatEx',
-            routeMilepost: baseUrl + 'Milepost_Segment',
-            uploadUrl: baseUrl + 'uploads/upload'
+            mainReport: baseUrl + '/PEL_Main',
+            catexReport: baseUrl + '/PEL_CatEx',
+            routeMilepost: baseUrl + '/Milepost_Segment',
+            uploadUrl: baseUrl + '/uploads/upload'
         }
     };
 

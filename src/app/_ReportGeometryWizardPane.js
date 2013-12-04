@@ -151,7 +151,7 @@ define([
                 state = true,
                 css = null;
 
-            if (!file){
+            if (!file) {
                 state = false;
             }
 
@@ -238,6 +238,8 @@ define([
             // 
             console.log('app._ReportGeometryWizardPane::uploadFile', arguments);
 
+            domClass.add(this.uploadActitvity, 'progress progress-striped active');
+
             esriRequest({
                 url: AGRC.urls.uploadUrl,
                 form: this.uploadForm,
@@ -245,7 +247,8 @@ define([
                     f: "json"
                 },
                 handleAs: "json"
-            }).then(lang.hitch(this, '_setUploadedFileId'));
+            }).then(lang.hitch(this, '_setUploadedFileId'),
+                lang.hitch(this, '_uploadError'));
         },
         _setUploadedFileId: function(response) {
             // summary:
@@ -262,11 +265,13 @@ define([
             // }
             console.log('app._ReportGeometryWizardPane::_setUploadedFileId', arguments);
 
+            domClass.remove(this.uploadActitvity, 'progress progress-striped active');
+
             if (!response.success)
                 return;
 
-            for(var prop in response.item){
-                if(prop != 'itemID'){
+            for (var prop in response.item) {
+                if (prop != 'itemID') {
                     delete response.item[prop];
                 }
             }
@@ -312,8 +317,18 @@ define([
             //      performs actions when pane is hidden
             // 
             console.log('app._ReportGeometryWizardPane::onHide', arguments);
-         
+
             topic.publish('app/enable-tool');
+        },
+        _uploadError: function(e) {
+            // summary:
+            //      updates ui for error reasons
+            // e
+            console.log('app._ReportGeometryWizardPane::_uploadError', arguments);
+
+            domClass.remove(this.uploadActitvity, 'progress progress-striped active');
+
+            alert(e.message);
         }
     });
 });
