@@ -1,3 +1,4 @@
+/*globals AGRC:true*/
 require([
         'app/ReportGeneratorWizard',
 
@@ -23,7 +24,7 @@ require([
                 testWidget = new WidgetUnderTest({},
                     domConstruct.create('div', {}, win.body()));
                 testWidget.startup();
-
+                AGRC = {extentMaxArea: 1210000000};
             });
             afterEach(function() {
                 testWidget.destroy();
@@ -75,7 +76,8 @@ require([
                         buffer: 1,
                         geometry: polyline,
                         name: 'my report',
-                        shapefile: false
+                        shapefile: false,
+                        zip: null
                     });
                 });
             });

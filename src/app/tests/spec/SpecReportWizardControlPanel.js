@@ -21,22 +21,28 @@ require([
                     panes: [{
                         startup: function() {},
                         on: function(){},
-                        onShow: function(){}
+                        onShow: function(){},
+                        onHide: function () {}
                     }, {
                         startup: function() {},
                         on: function(){},
-                        onShow: function(){}
+                        onShow: function(){},
+                        onHide: function () {}
                     }, {
                         startup: function() {},
                         on: function(){},
-                        onShow: function(){}
+                        onShow: function(){},
+                        onHide: function () {}
                     }],
                     parentWidget: {
                         gp: {
                             on: function(){}
                         },
                         sc: {
-                            selectChild: function() {}
+                            selectChild: function() {},
+                            selectedChildWidget: {
+                                onHide: function () {}
+                            }
                         }
                     }
                 },
