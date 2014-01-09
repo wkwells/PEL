@@ -15,14 +15,16 @@ var profile = {
                 'dojo/domReady',
                 'app/main',
                 'app/run',
-                'esri/dijit/Attribution'
+                'esri/dijit/Attribution',
+                'spin'
             ],
             customBase: true,
             boot: true
         },
         'app/run_user_admin': {
             include: [
-                'app/run_user_admin'
+                'app/run_user_admin',
+                'spin'
             ]
         }
     },

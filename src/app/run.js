@@ -20,7 +20,10 @@
             name: 'jquery',
             location: projectUrl + 'jquery',
             main: 'jquery'
-        }]
+        }],
+        aliases: [
+            ['spin', 'agrc/resources/libs/spin']
+        ] 
         // defaultConfig: {
         //     locale: 'en-us'
         // }
