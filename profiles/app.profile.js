@@ -45,22 +45,27 @@ var profile = {
         // We aren’t loading tests in production
         'dojo-test-sniff': 0
     },
-    packages: [{
-        name: 'dojo',
-        location: 'dojo'
-    }, {
-        name: 'dijit',
-        location: 'dijit'
-    }, {
-        name: 'dojox',
-        location: 'dojox'
-    }, {
-        name: 'esri',
-        location: 'esri',
-        resourceTags: {
-            amd: function(filename, mid) {
-                return (/.*\.js/).test(filename);
+    packages: [
+        {
+            name: 'dojo',
+            location: 'dojo'
+        }, {
+            name: 'dijit',
+            location: 'dijit'
+        }, {
+            name: 'dojox',
+            location: 'dojox'
+        }, {
+            name: 'esri',
+            location: 'esri',
+            resourceTags: {
+                amd: function(filename, mid) {
+                    return (/.*\.js/).test(filename);
+                }
             }
         }
-    }]
+    ],
+    aliases: [
+        ['spin', 'agrc/resources/libs/spin']
+    ] 
 };
