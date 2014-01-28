@@ -31,6 +31,7 @@
     ];
     require(config, [
             'ijit/widgets/authentication/UserAdmin',
+
             'dojo/domReady!'
         ],
 
